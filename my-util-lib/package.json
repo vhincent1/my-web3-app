@@ -1,0 +1,21 @@
+{
+  "name": "@my-util-lib/utils",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "NODE_ENV=development tsx watch index.ts"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "fs": "^0.0.1-security",
+    "promises": "^0.2.5",
+    "tsx": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.10",
+    "path": "^0.12.7"
+  }
+}

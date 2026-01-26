@@ -1,0 +1,48 @@
+<style>
+  .container {
+    font-family: monospace;
+  }
+
+  .container h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0px;
+  }
+
+  /* #error {
+    border: 1px solid red;
+    background-color: rgb(251, 80, 80);
+  } */
+</style>
+<div class="container" id="program-motd">
+  <h4>Message Of The Day</h4>
+  Program: <%= program.programId %>
+  <br />
+ <%if (program.state?.is_initialized) {%>
+  Admin: <%= program.state.admin %> <br />
+  Current: <%= program.state.message %> <br />
+  <form action="/message" method="POST">
+    <input type="hidden" name="variant" value="1">
+    <label for="motd">Update (maxlength=512):</label> <br />
+    <textarea id="motd" name="userInput" rows="1" cols="30" maxlength="512"></textarea> <br />
+    <!-- <input type="text" maxlength="512"></input> -->
+    <input type="submit" value="Submit">
+  </form>
+  <%} else {%>
+  <!-- TODO: initialize form -->
+  <form action="/message" method="POST">
+    <label for="motd">Initialize (maxlength=512):</label>
+    <input type="hidden" name="variant" value="0">
+    <!-- <textarea id="motd" name="userInput" rows="1" cols="30" maxlength="512"></textarea> <br /> -->
+    <input type="text" name="userInput" maxlength="512"></input>
+    <input type="submit" value="Submit">
+  </form>
+  <%}%>
+  <!-- status -->
+  <% if(typeof status !== 'undefined') {%>
+  <span id="status"><%= status %></span>
+  <% } %>
+</div>

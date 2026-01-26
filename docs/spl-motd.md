@@ -1,0 +1,185 @@
+To do this, we don't actually need an "SPL Token" (which represents currency or assets). Instead, we need a **Global State Program**.
+
+We will use a **PDA (Program Derived Address)** with a static seed (like `"motd"`). This creates a known, fixed address where the message lives, so anyone on the blockchain can find it without needing to ask "which account address holds the message?"
+
+Here is the complete solution using the **Anchor Framework**.
+
+### 1. The Rust Program (`lib.rs`)
+
+This program initializes a global account that stores the message. We add an `admin` check so only the creator can change the message later.
+
+```rust
+use anchor_lang::prelude::*;
+
+declare_id!("YOUR_PROGRAM_ID_HERE");
+
+#[program]
+pub mod motd_program {
+    use super::*;
+
+    // 1. Initialize the global MOTD account (Run this once)
+    pub fn initialize(ctx: Context<Initialize>, message: String) -> Result<()> {
+        let motd_account = &mut ctx.accounts.motd_account;
+        
+        if message.len() > 200 {
+            return err!(ErrorCode::MessageTooLong);
+        }
+
+        motd_account.admin = ctx.accounts.signer.key();
+        motd_account.message = message;
+        motd_account.bump = ctx.bumps.motd_account;
+        
+        Ok(())
+    }
+
+    // 2. Update the message (Only admin can do this)
+    pub fn update_motd(ctx: Context<Update>, message: String) -> Result<()> {
+        let motd_account = &mut ctx.accounts.motd_account;
+
+        if message.len() > 200 {
+            return err!(ErrorCode::MessageTooLong);
+        }
+
+        motd_account.message = message;
+        
+        Ok(())
+    }
+}
+
+// --- ACCOUNT STRUCTURES ---
+
+#[account]
+pub struct MotdAccount {
+    pub admin: Pubkey,    // 32 bytes
+    pub message: String,  // 4 bytes prefix + 200 bytes content
+    pub bump: u8,         // 1 byte
+}
+
+#[derive(Accounts)]
+pub struct Initialize<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        init,
+        payer = signer,
+        // Static seed "motd" ensures there is only ONE message account for this program
+        seeds = [b"motd"], 
+        bump,
+        space = 8 + 32 + 4 + 200 + 1 
+    )]
+    pub motd_account: Account<'info, MotdAccount>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct Update<'info> {
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        mut,
+        seeds = [b"motd"],
+        bump = motd_account.bump,
+        // Constraint: Only the original admin can change the message
+        constraint = motd_account.admin == signer.key()
+    )]
+    pub motd_account: Account<'info, MotdAccount>,
+}
+
+#[error_code]
+pub enum ErrorCode {
+    #[msg("Message cannot be longer than 200 characters.")]
+    MessageTooLong,
+}
+```
+
+---
+
+### 2. Client-Side (TypeScript)
+
+Because we used a static seed (`"motd"`), your frontend doesn't need to know the account address beforehand. It can calculate it instantly using the Program ID.
+
+```typescript
+import * as anchor from "@project-serum/anchor";
+import { Program } from "@project-serum/anchor";
+
+async function motdClient() {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+  const program = anchor.workspace.MotdProgram;
+
+  // 1. Derive the Global Address (PDA)
+  // Since the seed is just "motd", this address is constant!
+  const [motdPda] = await anchor.web3.PublicKey.findProgramAddress(
+    [Buffer.from("motd")],
+    program.programId
+  );
+
+  console.log("Global MOTD Address:", motdPda.toString());
+
+  // --- WRITE (Create) ---
+  // Run this only once to set up the account
+  try {
+      console.log("Initializing...");
+      await program.methods
+        .initialize("Welcome to Solana!")
+        .accounts({
+          signer: provider.wallet.publicKey,
+          motdAccount: motdPda,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc();
+  } catch(e) {
+      console.log("Account likely already exists, skipping init.");
+  }
+
+  // --- READ ---
+  // Anyone can do this part without a wallet signature
+  let account = await program.account.motdAccount.fetch(motdPda);
+  console.log("Current Message:", account.message); 
+
+  // --- UPDATE ---
+  // Only the admin can do this
+  console.log("Updating...");
+  await program.methods
+    .updateMotd("Don't forget to drink water!")
+    .accounts({
+      signer: provider.wallet.publicKey,
+      motdAccount: motdPda,
+    })
+    .rpc();
+
+  // Read again to verify
+  account = await program.account.motdAccount.fetch(motdPda);
+  console.log("New Message:", account.message);
+}
+```
+
+### How to use this in a real Web App (React/Next.js)
+
+If you just want to **read** the message on a website (without asking the user to connect a wallet), you can use a generic connection:
+
+```javascript
+import { Connection, PublicKey } from '@solana/web3.js';
+import { Program, AnchorProvider } from '@project-serum/anchor';
+import idl from './idl.json'; // The JSON generated by Anchor build
+
+async function getMessageOfTheDay() {
+    const connection = new Connection("https://api.devnet.solana.com");
+    const programId = new PublicKey("YOUR_PROGRAM_ID");
+    
+    // Create a read-only provider
+    const provider = new AnchorProvider(connection, null, {});
+    const program = new Program(idl, programId, provider);
+
+    const [motdPda] = await PublicKey.findProgramAddress(
+        [Buffer.from("motd")],
+        programId
+    );
+
+    const account = await program.account.motdAccount.fetch(motdPda);
+    return account.message;
+}
+```

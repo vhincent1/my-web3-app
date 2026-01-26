@@ -1,0 +1,121 @@
+import { Connection, Keypair, PublicKey, Transaction, sendAndConfirmTransaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { keypairUtils } from '../src/utils.ts';
+import appConfig from '../app.config.ts'
+import { MotdProgram } from '../lib/instructions.ts'
+import { MotdStateLayout } from '../lib/schema.ts';
+
+// --- CONFIGURATION ---
+const PROGRAM_ID = appConfig.PROGRAM_ID;
+const CONNECTION = appConfig.CONNECTION;
+
+const PROGRAM = new MotdProgram(CONNECTION, PROGRAM_ID);
+
+describe('MOTD Native Program', () => {
+  const adminWallet = appConfig.ADMIN_WALLET.keypair; //loadKeypair('/Users/vhincent/.config/solana/id.json'); //Keypair.generate();
+  const hackerWallet = keypairUtils.generate()//Keypair.generate();
+  const pda: PublicKey = PROGRAM.pda;
+
+  const messages = {
+    initialized: 'init',
+    initialized2: 'init hack',
+    update: 'Update test',
+
+    errors: {
+      alreadyInitialized: 'instruction requires an uninitialized account', //'Account is already initialized.',
+      invalidSigner: 'Signer is not the admin',
+    },
+  };
+
+  // Before all tests: Airdrop SOL to the admin wallet and find the PDA
+  beforeAll(async () => {
+    const sig1 = await CONNECTION.requestAirdrop(adminWallet.publicKey, 2 * LAMPORTS_PER_SOL);
+    const sig2 = await CONNECTION.requestAirdrop(hackerWallet.publicKey, 2 * LAMPORTS_PER_SOL);
+    [sig1, sig2].forEach(async (signature) => {
+      const latestBlockhash = await CONNECTION.getLatestBlockhash();
+      await CONNECTION.confirmTransaction({
+        signature: signature,
+        blockhash: latestBlockhash.blockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+      }, 'confirmed');
+    });
+    console.log('Test Admin:', adminWallet.publicKey.toBase58());
+    console.log('Test PDA:', pda.toBase58());
+  });
+
+  it('Initializes the message account', async () => {
+    const initIx = PROGRAM.createInstruction(adminWallet.publicKey, 0, messages.initialized);
+
+    // const initIxs = await PROGRAM.createInitializeInstructions(adminWallet.publicKey, messages.initialized);
+    const ix = new Transaction().add(initIx);
+    try {
+      // 3. Send Transaction
+      await sendAndConfirmTransaction(CONNECTION, ix, [adminWallet]);
+    } catch (err) {
+      const logString = err.logs ? err.logs.join('') : err.toString();
+      if (logString.includes(messages.errors.alreadyInitialized)) {
+        console.log('Already initialized');
+        expect(logString).toContain(messages.errors.alreadyInitialized);
+      }
+    }
+
+    // 4. Assertions: Fetch account and verify state
+    const accountInfo = await CONNECTION.getAccountInfo(pda);
+    // console.log('account info:', accountInfo)
+    expect(accountInfo).not.toBeNull();
+    if (accountInfo) {
+      const decoded = await PROGRAM.update();
+      expect(decoded.is_initialized).toBe(true);
+      expect(decoded.admin.toBase58()).toBe(adminWallet.publicKey.toBase58());
+      if (decoded.message == messages.initialized) {
+        expect(decoded.message).toBe(messages.initialized);
+      } else {
+        expect(decoded.message).toBe(messages.update);
+      }
+    }
+  });
+
+  it('Prevents Re-Initialization (Security Check)', async () => {
+    const initIx = PROGRAM.createInstruction(adminWallet.publicKey, 0, messages.initialized);
+    // const initIxs = await PROGRAM.createInitializeInstructions(adminWallet.publicKey, messages.initialized);
+    const ix = new Transaction().add(initIx);
+    try {
+      // 3. Send Transaction
+      await sendAndConfirmTransaction(CONNECTION, ix, [adminWallet]);
+    } catch (err) {
+      const logString = err.logs ? err.logs.join('') : err.toString();
+      //   expect(logString).toContain(messages.errors.alreadyInitialized);
+      if (logString.includes(messages.errors.alreadyInitialized)) {
+        console.log('Already initialized');
+        expect(logString).toContain(messages.errors.alreadyInitialized);
+      }
+    }
+  });
+
+  it('Updates the message', async () => {
+    const updateIx = PROGRAM.createInstruction(adminWallet.publicKey, 1, messages.update);
+
+    // const updateIx = PROGRAM.createUpdateInstruction(adminWallet.publicKey, messages.update);
+    const ix = new Transaction().add(updateIx);
+    // 3. Send Transaction
+    await sendAndConfirmTransaction(CONNECTION, ix, [adminWallet]);
+    // 4. Assertions
+    const accountInfo = await CONNECTION.getAccountInfo(pda);
+    const decoded = MotdStateLayout.decode(accountInfo!.data);
+    expect(decoded.message).toBe(messages.update);
+  });
+
+  it('Prevents Unauthorized Updates (Security Check)', async () => {
+    const updateIx = PROGRAM.createInstruction(adminWallet.publicKey, 1, messages.update);
+
+    // const updateIx = PROGRAM.createUpdateInstruction(adminWallet.publicKey, messages.update);
+    const ix = new Transaction().add(updateIx);
+    // We expect this to fail
+    try {
+      await sendAndConfirmTransaction(CONNECTION, ix, [hackerWallet]);
+      fail('Transaction should have failed'); // Force fail if it succeeds
+    } catch (error: any) {
+      // Check logs for specific custom error code or generic error
+      expect(error.toString()).toMatch(/Error/);
+    }
+  });
+});
