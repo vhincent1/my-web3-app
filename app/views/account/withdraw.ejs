@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+
+<div id="withdraw-form" class="container">
+  <% //const { account, address, amount } = {account: {id: 0}, address: "", amount:9} %>
+
+  <% const hasField = (value) => value !== 'undefined' ? value : '' %>
+  Withdraw form
+  <br>
+  <form action="/api/account/withdraw" method="POST">
+    <!-- <input type="hidden" name="variant" value="0"> -->
+    <label>Address:<input type="text" name="address" size="44" maxlength="44" value="<%= address %>" <%= hasField(address) ? 'readonly' : 'required'%> class="<%= hasField(address) ? 'readonly-input' : '' %>"></input></label>
+    <br>
+    <label>Recipient:<input type="text" name="recipient" size="44" maxlength="44" value="<%= recipient  %>" <%= hasField(recipient) ? 'readonly' : 'required'%> class="<%= hasField(recipient) ? 'readonly-input' : '' %>"></input></label>
+    <br>
+    <label>Amount:<input type="number" name="amount" id="amount" step="0.0001" min="0" value="<%= amount %>" <%= hasField(amount) ? 'readonly' : 'required' %> class="<%= hasField(amount) ? 'readonly-input' : '' %>"></label>
+    <br>
+    <input type="submit" value="Submit">
+  </form>
+</div>
+<br>
+<%- include('../partials/status') %>
+<%- include('../partials/footer') %>

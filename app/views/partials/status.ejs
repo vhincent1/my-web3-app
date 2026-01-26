@@ -1,0 +1,7 @@
+<% if(typeof status !== 'undefined') {%>
+<span id="status" class="status-msg <%= status.includes('Error:') ? 'status-error' : 'status-success' %>">
+  <%= status %>
+</span>
+<br>
+<br>
+<% } %>

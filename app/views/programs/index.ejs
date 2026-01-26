@@ -1,0 +1,54 @@
+<h3>Programs</h3>
+<%- include('../partials/status') %>
+<% /*------------- DISABLED -------------*/ %>
+<% if(typeof disabled !== 'undefined') {%>
+<!-- programs -->
+<% programs.forEach(entry => { %>
+<div class="container" id="program-<%= entry.alias %>">
+  <h4><%= entry.name %></h4>
+  <% if(entry.program) {  // if program exists %>
+  Program id: <%= entry.program.programId %> <br />
+  <% if(entry.ejs?.partialExists) { // if partial file exists%>
+  <%- include('../programs/' + entry.ejs.fileName, { entry }) %>
+  <% } else { %>
+  <%= entry.alias %>.ejs not found
+  <% } %>
+  <% } else { %>
+  Program '<%= entry.name %>' not found
+  <% } %>
+</div>
+<% }); %>
+<br>
+<br>
+<% } %>
+<% /*------------- DISABLED -------------*/ %>
+<span class="tab">
+  <form action="/dashboard/tab" method="POST" id="myTab">
+    <% programs.forEach((entry, index) => { %>
+    <% const isActive = tab == index ? 'active': '' %>
+    <button class="tablinks <%= isActive %>" id="defaultOpen" type="submit" form="myTab" name="tabInput" value="<%= index %>"><%=entry.name%></button>
+    <% }) %>
+    <button class="tablinks <%= (tab == 1) ? 'active' : '' %>" id="defaultOpen" type="submit" form="myTab" name="tabInput" value="1">Test</button>
+  </form>
+</span>
+<% if(typeof tab === 'undefined') { %>
+select a program
+<% } %>
+<% const entry = programs[tab]; %>
+<% if(entry) { %>
+<div class="container" id="program-<%= entry.alias %>">
+  <h4><%= entry.name %></h4>
+  <% if(entry.program) {  // if program exists %>
+  Program id: <%= entry.program.programId %> <br />
+  <% if(entry.ejs?.partialExists) { // if partial file exists %>
+  <%- include('../programs/' + entry.ejs.fileName, { entry }) %>
+  <% } else { %>
+  <%= entry.alias %>.ejs not found
+  <% } %>
+  <% } else { %>
+  Program '<%= entry.name %>' not found
+  <% } %>
+</div>
+<% } else { %>
+<!-- Entry not found -->
+<% } %>

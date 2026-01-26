@@ -1,0 +1,49 @@
+<% if (account) {
+  const addresses = account.getWallet().addresses || [];
+  const total = account.getBalances().total;
+%>
+<div class="container" id="account">
+  <h3>Account</h3>
+  <p>Account: id=<%= account.id %> identifier=<%= account.identifier %> keypairs=<%= addresses.length %></p>
+  <details>
+    <summary>Show seed phrase</summary>
+    <span class="seed" style="margin: 0px; background-color: lightgray"><%= account.getWallet().mnemonic %></span>
+  </details>
+  <br>
+  <h3>Addresses</h3>
+  <p>Total SOL: <%= total %></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Network</th>
+        <th>Address</th>
+        <th>Balance</th>
+        <th>Links</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% addresses.forEach(addr => {
+           const pub = addr.keypair.publicKey;
+           const bal = addr.balance;
+
+           const withdraw = () =>{
+              const addressStr = pub ? `?address=${encodeURIComponent(pub)}` : ''
+              const amountStr = bal > 0 ? `&amount=${encodeURIComponent(bal)}` : ''
+              return `/api/account/withdraw${addressStr}${amountStr}`;
+           } %>
+      <tr>
+        <td>SOL</td>
+        <td><%= pub %></td>
+        <td><%= bal %></td>
+        <td>[<a href="<%= withdraw() %>" target="_blank" rel="noopener noreferrer">withdraw</a>]</td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <form action="/api/account/generate-address" method="POST"><button type="submit">Generate address</button></form>
+  <form action="/api/account/withdraw" method="GET"><button type="submit">Withdraw</button></form>
+</div>
+<% } else { %>
+<div class="container" id="account">Account not found</div>
+<% } %>

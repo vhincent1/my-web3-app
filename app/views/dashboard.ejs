@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/stylesheet.css">
+</head>
+
+<body>
+  <h1>Dashboard</h1>
+  <div class="container" id="session">
+    <% if(session) { %>
+    Session: publicKey=<%= session.user.publicKey %> userId=<%= session.user.userId %>
+    <% } else { %>
+    Session not found (log in)
+    <% } %>
+  </div>
+
+  <% if(session) { %>
+  <%- include('./account/index') %> <br>
+  <%- include('./programs/index', {tab}) %><br>
+  <% } %>
+</body>
+
+</html>
