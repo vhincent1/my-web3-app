@@ -1,9 +1,5 @@
 A 'Message Of The Day' Solana program, that stores a message in the program, and you can read/update the message
 
-###### install: 
-* [solana-cli](https://solana.com/docs/intro/installation)
-* [agave-install](https://docs.anza.xyz/cli/install)
-
 ###### usage: 
 1. change the values `adminKeypair`,`rpcEndpoint` in `app.config.ts`
 
