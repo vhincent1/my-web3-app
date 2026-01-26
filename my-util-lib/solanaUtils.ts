@@ -32,7 +32,7 @@ const logKeypair = async (keypair: Keypair) => {
 
   await appendJsonToFile(logFile, {
     publicKey: keypair.publicKey.toBase58(),
-    secretKey: keypair.secretKey,
+    secretKey: keypair.secretKey.toString(),
   });
 };
 
@@ -69,45 +69,6 @@ const appendJsonToFile = async (filePath, append) => {
 //   port: { alias: 'p', type: 'number', desc: 'client port', default: null },
 // };
 
-const parseArgs = (args, options) => {
-  const flags = {};
-  const positionals = [];
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (arg.startsWith('--')) {
-      // Handle Double Dash (--flag)
-      const key = arg.substring(2);
-      const nextValue = args[i + 1];
-      if (nextValue && !nextValue.startsWith('-')) {
-        flags[key] = nextValue;
-        i++;
-      } else flags[key] = true;
-    } else if (arg.startsWith('-')) {
-      // Handle Single Dash (-f or -abc)
-      const chars = arg.substring(1);
-      // If it's a single char, it can take a value: -p 8080
-      if (chars.length === 1) {
-        const nextValue = args[i + 1];
-        if (nextValue && !nextValue.startsWith('-')) {
-          flags[chars] = nextValue;
-          i++;
-        } else flags[chars] = true;
-      }
-      // If it's multiple chars, treat as a cluster: -abc => a:true, b:true, c:true
-      else for (const char of chars) flags[char] = true;
-    } else positionals.push(arg);
-  }
-  if (options) {
-    // 1. Get the list of allowed keys
-    const allowedKeys = Object.keys(options);
-    const unrecognized = Object.keys(flags).filter((key) => !allowedKeys.includes(key) && key !== 'help' && key !== 'h');
-    if (unrecognized.length > 0) {
-      console.error(`Error: Unrecognized flags: ${unrecognized.map((k) => `-${k.length > 1 ? '-' : ''}${k}`).join(', ')}`);
-      process.exit(0);
-    }
-  }
-  return { flags, positionals };
-};
 
 const keypairUtils = {
   generateKeypair,

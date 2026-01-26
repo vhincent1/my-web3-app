@@ -1,5 +1,5 @@
 import { Connection, Keypair, PublicKey, Transaction, sendAndConfirmTransaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { keypairUtils } from '../src/utils.ts';
+import { keypairUtils } from '@my-util-lib/utils';
 import appConfig from '../app.config.ts'
 import { MotdProgram } from '../lib/instructions.ts'
 import { MotdStateLayout } from '../lib/schema.ts';
@@ -12,7 +12,7 @@ const PROGRAM = new MotdProgram(CONNECTION, PROGRAM_ID);
 
 describe('MOTD Native Program', () => {
   const adminWallet = appConfig.ADMIN_WALLET.keypair; //loadKeypair('/Users/vhincent/.config/solana/id.json'); //Keypair.generate();
-  const hackerWallet = keypairUtils.generate()//Keypair.generate();
+  const hackerWallet = keypairUtils.generateKeypair()//Keypair.generate();
   const pda: PublicKey = PROGRAM.pda;
 
   const messages = {

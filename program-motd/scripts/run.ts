@@ -1,6 +1,8 @@
 import appConfig from '../app.config.ts';
 import app from '../src/app.ts';
-import { keypairUtils, parseArgs } from '../src/utils.ts';
+
+// import { keypairUtils, parseArgs } from '../src/utils.ts';
+import {keypairUtils, parseArgs } from '@my-util-lib/utils'
 
 const startServer = () =>
   app.listen(appConfig.PORT, () => {

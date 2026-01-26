@@ -1,6 +1,6 @@
 import path from 'path'
 import { Connection, Keypair } from '@solana/web3.js';
-import { keypairUtils } from './src/utils.ts';
+import { keypairUtils } from '@my-util-lib/utils';
 
 /**
  * Config
@@ -15,8 +15,8 @@ const rpcUrl = 'http://thinkpadx270:8899'
 
 const CONNECTION = new Connection(rpcUrl, 'confirmed');
 // const ADMIN_WALLET = { filePath: adminKeypair, keypair: keypairUtils.generate() }
-const ADMIN_WALLET = keypairUtils.load(adminKeypair)
-const PROGRAM_WALLET = keypairUtils.load(programKeypair)
+const ADMIN_WALLET = keypairUtils.loadKeypair(adminKeypair)
+const PROGRAM_WALLET = keypairUtils.loadKeypair(programKeypair)
 
 export default {
     // solana program

@@ -15,6 +15,7 @@
     "program:test": "yarn run jest tests/motd.test.ts"
   },
   "dependencies": {
+    "@my-util-lib/utils" :"file: ../my-util-lib",
     "@coral-xyz/borsh": "^0.32.1",
     "ejs": "^3.1.10",
     "express": "^5.2.1",
