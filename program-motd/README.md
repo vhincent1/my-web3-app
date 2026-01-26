@@ -1,0 +1,1 @@
+a 'message of the day' solana program
