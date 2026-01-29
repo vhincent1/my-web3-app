@@ -9,10 +9,10 @@ export const addApiRoute = (path: string, type: 'GET' | 'POST', middleware: any,
     POST: router.post.bind(router),
     //put, delete
   };
-  console.log('add api route:', `type=${type} path=api${path}`);
   routes.push({ path, type });
   // Pass middleware and route together; Express handles them as a sequence
   methodMap[type](path, middleware || [], route);
+  console.info('[API Route]:', `add type=${type} path=api${path}`);
 };
 
 router.get('/', async (req, res) => {

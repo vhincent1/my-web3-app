@@ -1,7 +1,7 @@
 {
   "name": "@my-util-lib/utils",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "license": "MIT",
   "private": true,
   "type": "module",
@@ -9,6 +9,7 @@
     "start": "NODE_ENV=development tsx watch index.ts"
   },
   "dependencies": {
+    "@solana/spl-token": "^0.4.14",
     "@solana/web3.js": "^1.98.4",
     "fs": "^0.0.1-security",
     "promises": "^0.2.5",

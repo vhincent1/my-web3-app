@@ -3,7 +3,7 @@ import express from 'express';
 import { Connection, PublicKey } from '@solana/web3.js';
 import mySolanaProgram from '@my-web3-app/motd';
 
-import { programs } from '../controllers/programs/index.controller.ts';
+import { programsController } from '../controllers/programs/index.controller.ts';
 import { accountRepository } from '../controllers/accounts/index.accounts.ts';
 import AccountController from '../controllers/accounts/AccountController.ts';
 import { addApiRoute } from './api.routes.ts';
@@ -45,7 +45,7 @@ app.get('/', async (req, res) => {
     status: status, // status div
     tab: tab,
     account: account, // account.ejs
-    programs, // programs.ejs
+    programs: programsController.programs, // programs.ejs
   });
 });
 

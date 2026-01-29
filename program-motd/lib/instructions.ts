@@ -20,7 +20,7 @@ export class MotdProgram {
   }
 
   async initialize() {
-    console.log('init')
+    console.log('[MotdProgram] initialize')
     const state = await this.update();
     this.state = state;
   }
@@ -28,7 +28,7 @@ export class MotdProgram {
   errorCodes = () => {};
 
   async update(): Promise<MotdState> {
-    console.log('Update account...');
+    console.log('[MotdProgram] update')
     try {
       if (!(await this.connection.getAccountInfo(this.programId))) {
         return { is_initialized: false, admin: PublicKey.default, message: 'Program not found', stage: 0 };
@@ -117,19 +117,19 @@ export class MotdProgram {
       const checkMessage = this.validateMessage(type, message, true);
       if (!checkMessage.valid) return { status: checkMessage.error };
       
-      console.log('Update check')
+      // console.log('Update check')
       const state = await this.update();
       if (!state.is_initialized) return { status: state.message };
 
       const ix = this.createInstruction(payer.publicKey, type, message);
       const tx = new Transaction().add(ix);
 
-      console.log('send')
+      // console.log('send')
       const signature = await sendAndConfirmTransaction(this.connection, tx, [payer]);
-      console.log('signature: ',signature)
+      // console.log('signature: ',signature)
       return { status: `Success: tx signature: ${signature}` };
     } catch (err) {
-      console.log('submitMessage: ',err)
+      // console.log('submitMessage: ',err)
       // if (err instanceof Error) return { status: err.message };
       // return { status: err.transactionMessage };
       // return { status: err.message ?? err.transactionMessage };

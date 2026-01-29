@@ -1,57 +1,52 @@
-import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
-import { accountDetails, displayWalletTokens, generateKeypair, loadKeypair, OWNER_KEYPAIR_PATH, requestAirdrop, TREASURY_KEYPAIR_PATH, USER_KEYPAIR_PATH } from './keypair.ts';
+import { OWNER_KEYPAIR_PATH, USER_KEYPAIR_PATH } from '../app.config.ts';
+import { Connection } from '@solana/web3.js';
 import { createSolanaToken, sendSPLTokens } from './createToken.ts';
-import { publicKey } from '@coral-xyz/borsh';
+import { keypairUtils, solanaUtils, parseArgs } from '@my-util-lib/utils';
 
 const connection = new Connection('http://thinkpadx270:8899', 'confirmed');
-const COMMANDS = {
+const getArg = (index: number, fallback?: string) => process.argv[index] || fallback;
+
+const commands: any = {
   keygen: () => {
-    const filename = process.argv[3];
-    generateKeypair(filename);
+    const filename = getArg(3);
+    keypairUtils.generateKeypair(filename);
   },
-  airdrop: () => {
-    const path = process.argv[3] || OWNER_KEYPAIR_PATH;
-    const keypair = loadKeypair(path);
-
-    requestAirdrop(connection, keypair.publicKey);
+  airdrop: async () => {
+    const keypair = keypairUtils.loadKeypair(getArg(3, OWNER_KEYPAIR_PATH));
+    solanaUtils.requestAirdrop(connection, keypair.keypair.publicKey, 1);
   },
-  splSetup: async () => {
-    const ownerKeypair = loadKeypair(OWNER_KEYPAIR_PATH);
-    const treasuryKeypair = loadKeypair('./config/treasury-keypair.json');
-    const userKeypair = loadKeypair('./config/user-keypair.json');
-
-    [ownerKeypair, treasuryKeypair, userKeypair].forEach((kp) => requestAirdrop(connection, kp.publicKey));
-
-    setTimeout(async () => {
-      const splToken = await Promise.resolve(createSolanaToken(connection, ownerKeypair));
-
-      [treasuryKeypair, userKeypair].forEach((kp) => sendSPLTokens(connection, ownerKeypair, splToken.mintAddress, 10, kp.publicKey));
-    }, 2 * 1000 /* 2 seconds */);
+  'read-key': async () => {
+    const keypair = keypairUtils.loadKeypair(getArg(3, USER_KEYPAIR_PATH));
+    solanaUtils.accountDetails(connection, keypair.keypair.publicKey);
+    solanaUtils.displayWalletTokens(connection, keypair.keypair.publicKey);
   },
-  'read-key': () => {
-    const filename = process.argv[3] || USER_KEYPAIR_PATH;
+  'spl-setup': async () => {
+    const [owner, treasury, user]: any = [OWNER_KEYPAIR_PATH, './config/treasury-keypair.json', './config/user-keypair.json'].map((f) => keypairUtils.loadKeypair(f));
 
-    const keypair = loadKeypair(filename);
+    [owner, treasury, user].forEach((kp: any) => solanaUtils.requestAirdrop(connection, kp.keypair.publicKey, 1));
 
-    accountDetails(connection, keypair.publicKey);
-    displayWalletTokens(connection, keypair.publicKey);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const splToken = await createSolanaToken(connection, owner.keypair);
+    [treasury, user].forEach((kp) => sendSPLTokens(connection, owner.keypair, splToken.mintAddress, 10, kp.publicKey));
   },
 };
 
 const run = async () => {
-  const command = process.argv[2];
-  const scriptMap = Object.entries(COMMANDS).map(([key, value]) => {
-    return { name: key, exec: value };
-  });
-  const script = scriptMap.find((script) => script.name === command);
-  if (script) {
-    console.log(script);
-    script.exec();
+  const options: any = {
+    port: { alias: 'p', type: 'number', desc: 'client port', value: 3000 },
+    ...Object.fromEntries(Object.entries(commands).map(([k]) => [k, { type: 'void', desc: `run ${k}` }])),
+  };
+
+  const { flags, positionals }: any = parseArgs(process.argv.slice(2), options);
+  const command = Object.keys(commands).find((cmd) => flags[cmd]);
+
+  if (command) {
+    await commands[command]?.();
+  } else if (flags.port || flags.p) {
+    console.log('port:', parseInt(flags.port || flags.p));
   } else {
-    console.info(`command '${command}' not found, list of commands:`);
-    const commandList = Object.keys(COMMANDS).map((name) => name);
-    console.log(commandList.join(', '));
+    console.log('Available commands:', Object.keys(commands).join(', '));
   }
 };
 
-run();
+await run();

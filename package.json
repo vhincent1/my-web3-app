@@ -10,6 +10,7 @@
   "private": true,
   "workspaces": [
     "app/",
+    "my-util-lib/",
     "program-motd/"
   ],
   "scripts": {
@@ -22,31 +23,5 @@
     "program:size": "du -sh ./program-motd/program/target/deploy/motd.so",
     "program:test": "yarn run jest program-motd/tests/motd2.test.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "@my-web3-app/motd": "file:./program-motd",
-    "@coral-xyz/borsh": "^0.32.1",
-    "@solana/spl-token": "^0.4.14",
-    "@solana/web3.js": "^1.98.4",
-    "bip39": "^3.1.0",
-    "bs58": "^6.0.0",
-    "ejs": "^3.1.10",
-    "ethers": "^6.16.0",
-    "express": "^5.1.0",
-    "express-session": "^1.18.2",
-    "micro-ed25519-hdkey": "^0.1.2",
-    "path": "^0.12.7",
-    "tsx": "^4.21.0",
-    "tweetnacl": "^1.0.3"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/express-session": "^1.18.2",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^25.0.3",
-    "jest": "^30.2.0",
-    "terser": "^5.44.1",
-    "ts-jest": "^29.4.6",
-    "typescript": "^5.9.3"
   }
 }

@@ -2,6 +2,9 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 
 import { authMiddleware } from '../middleware/auth.middleware.ts';
+import AccountRepository from '../controllers/accounts/AccountRepository.ts';
+import { accountRepository } from '../controllers/accounts/index.accounts.ts';
+import bcrypt from 'bcryptjs';
 
 const router = express.Router();
 
@@ -13,14 +16,28 @@ const userSessions: any = {}; //pendingSignatures
 router.post('/', async (req, res) => {
   const { username, password } = req.body;
   // ... (verify user credentials)
-  const user = { id: 'someUserId', email: req.body.email }; // Example payload
-  const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1h' });
+  // const user = { id: 'someUserId', email: req.body.email }; // Example payload
 
-  req.session.token = token;
-  //   res.cookie('token', token, { httpOnly: true, maxAge: 3600000 }); // Store as httpOnly cookie
+  const account = accountRepository.findByIdentifier(username);
+  if (!account) {
+    return res.status(401).render('login', { status: 'Error: account not found' });
+  }
 
-  console.log(token);
-  //   res.redirect('/dashboard');
+  try {
+    if (await bcrypt.compare(password, account.password)) {
+      //create session
+      const user = { userId: account.id, publicKey: account.identifier };
+      const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1h' });
+      req.session.token = token;
+
+      console.log('Success');
+      res.status(200).redirect('/dashboard');
+    } else {
+      res.status(401).render('login', { status: 'Error: Invalid password' });
+    }
+  } catch (err) {
+    return res.status(500).send('Error' + err.message);
+  }
 });
 
 router.get('/', async (req, res) => {

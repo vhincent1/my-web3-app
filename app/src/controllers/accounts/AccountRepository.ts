@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import Account from './Account.ts';
 
 export default class AccountRepository {
@@ -8,6 +9,18 @@ export default class AccountRepository {
     this.#accounts = initialAccounts;
   }
 
+  authenticate = (identifier: string, password: string) => {
+    const account = this.#accounts.find((acc) => acc.identifier == identifier);
+    if (!account) return null;
+
+    if (account.password == password) {
+      return account;
+    } else {
+      return null;
+    }
+  };
+
+  findByIdentifier = (identifier: string) => this.#accounts.find((acc) => acc.identifier === identifier) ?? null;
   findById = (id: number) => this.#accounts.find((acc) => acc.id == id) ?? null;
   getAccounts = () => Object.freeze(this.#accounts.slice());
 
@@ -18,15 +31,22 @@ export default class AccountRepository {
     return id;
   };
 
-  register(account: Account) {
-    const exists = this.#accounts.find((acc) => acc.identifier == account.identifier);
-    if (exists === null) throw Error('Account already exists');
+  async register(username: string, password: string) {
+    const exists = this.findByIdentifier(username);
+    if (exists) throw Error('Exisiting identifier');
+
+    const hash = await bcrypt.hash(password, 10);
+    const account = new Account(this.getFreeId(), username, hash);
+
+    // update account list
     const updatedAccounts = this.#accounts.concat(account);
 
-    console.log('Registered:', account);
+    const { id, identifier } = account;
+    console.log(`Register Account[id=${id}, identifier=${identifier}]`);
 
     // this.#accounts.push(account);
     this.#accounts = updatedAccounts;
+    return account;
   }
 
   update(update: Account, updates: any) {

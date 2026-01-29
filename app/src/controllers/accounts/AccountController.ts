@@ -5,7 +5,8 @@ import { checkField, keypairUtils } from '@my-util-lib/utils';
 import { authMiddleware } from '../../middleware/auth.middleware.ts';
 import { addApiRoute } from '../../routes/api.routes.ts';
 import { accountRepository } from './index.accounts.ts';
-import { withdraw } from '../../lib/solana.lib.ts';
+import { solanaUtils } from '@my-util-lib/utils';
+import appConfig from '../../../app.config.ts';
 
 const router = express.Router();
 
@@ -47,11 +48,8 @@ const router = express.Router();
 function initialize(path) {
   /** withdraw form */
   addApiRoute('/account/withdraw', 'GET', authMiddleware, async (req, res) => {
-    // res.status(200).render('account/withdraw')
-    const account = req.account;
-    // console.log('account:', account);
-
     const { address, recipient, amount } = req.query;
+    const account = req.account;
 
     const status = req.session.status;
     delete req.session.status;
@@ -70,9 +68,8 @@ function initialize(path) {
   });
 
   addApiRoute('/account/withdraw', 'POST', authMiddleware, async (req, res) => {
-    const account = req.account;
-
     const { address, recipient, amount } = req.body;
+    const account = req.account;
 
     console.log('req:', req.body);
 
@@ -82,15 +79,14 @@ function initialize(path) {
       checkField(recipient, 'recipient');
       checkField(amount, 'amount');
 
-      const wallet = account.getWallet().addresses.find((key) => key.keypair.publicKey == address);
-      // wallet.balance = amount;
+      const wallet = account.getWallet().findByAddress(address);
       if (!wallet) {
         throw Error('address not found in wallet');
       } else if (wallet.balance < amount) {
         throw Error('invalid balance');
       } else {
         console.log('send');
-        const result = await withdraw(wallet.keypair, recipient, amount);
+        const result = await solanaUtils.withdraw(appConfig.CONNECTION, wallet.keypair, recipient, amount);
         req.session.status = result;
       }
     } catch (err) {
@@ -113,8 +109,6 @@ function initialize(path) {
   });
   /** -------------- */
   addApiRoute('/account/generate-address', 'POST', authMiddleware, async (req, res) => {
-    console.log('update');
-
     const account = req.account;
     // const userId = req.session.user.userId; //req.body.userId; // Access the data from the form
 

@@ -22,7 +22,7 @@ app.use(
     secret: 'your-strong-secret-key', // Required: Replace with a secure key
     resave: false, // Recommended: saves the session back to the store, even if not modified
     saveUninitialized: true, // Recommended: forces a session that is "uninitialized" to be saved to the store
-    cookie: { secure: false }, // Set to true if using HTTPS
+  //  store: new SQLiteStore({ db: 'sessions.db', dir: './var/db' })
   }),
 );
 
@@ -36,10 +36,8 @@ app.use((req, res, next) => {
 
   // temporary session
   if (appConfig.ENVIRONMENT.developement || appConfig.ENVIRONMENT.test) {
-    const user = { userId: 0, publicKey: 'Debug'};
-    // req.session.userId = 0;
-    // req.session.publicKey = 'DebugKey';
-    req.session.token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1h' });
+    // const user = { userId: 0, publicKey: 'Debug'};
+    // req.session.token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1h' });
   }
 
   // If a user is logged in (e.g., stored in req.session.user),

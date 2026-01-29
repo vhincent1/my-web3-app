@@ -14,7 +14,7 @@
     <% if(session) { %>
     Session: publicKey=<%= session.user.publicKey %> userId=<%= session.user.userId %>
     <% } else { %>
-    Session not found (log in)
+    Session not found (<a href="/login">Login</a>)
     <% } %>
   </div>
 

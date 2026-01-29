@@ -15,12 +15,12 @@
     "program:test": "yarn run jest tests/motd.test.ts"
   },
   "dependencies": {
-    "@my-util-lib/utils" :"file: ../my-util-lib",
     "@coral-xyz/borsh": "^0.32.1",
     "ejs": "^3.1.10",
     "express": "^5.2.1",
     "path": "^0.12.7",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "utils": "link:@my-util-lib/utils"
   },
   "devDependencies": {
     "@solana/web3.js": "^1.98.4",

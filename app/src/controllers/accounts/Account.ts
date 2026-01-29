@@ -6,16 +6,18 @@ import { Connection, Keypair, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.j
 export default class Account {
   id: number;
   identifier: string;
+  password: string;
 
   #wallet: {
     mnemonic: string;
     generated: number;
-    addresses: Array<{ keypair: Keypair, balance: number }>;
+    addresses: Array<{ keypair: Keypair; balance: number }>;
   };
 
-  constructor(id: number, identifier: string) {
+  constructor(id: number, identifier: string, password: string) {
     this.id = id;
     this.identifier = identifier;
+    this.password = password;
 
     this.#wallet = {
       mnemonic: bip39.generateMnemonic(),
@@ -38,7 +40,7 @@ export default class Account {
     const keypair = Keypair.fromSeed(derivedKey.privateKey);
     return keypair;
   };
-  
+
   #getKeypairs = () => Array.from({ length: this.#wallet.generated }, (_, i) => this.getKeypair(i));
 
   findKeypair = (targetAddress, maxSearch = 100) => {
@@ -66,6 +68,7 @@ export default class Account {
         this.#wallet.generated += 1;
       },
       ...this.#wallet,
+      findByAddress: (addr) => this.#wallet.addresses.find((key) => key.keypair.publicKey == addr),
     };
   }
 
