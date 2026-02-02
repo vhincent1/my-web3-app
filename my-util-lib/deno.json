@@ -1,0 +1,13 @@
+{
+  "name": "@my-web3-app/utils",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./srx/index.ts"
+  },
+  "tasks": {
+    "dev": "NODE_ENV=development deno run --watch index.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}

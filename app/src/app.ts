@@ -1,12 +1,13 @@
-import path from 'path';
+import path from 'node:path';
 import express from 'express';
 import app from './index.ts';
 import { programsController } from './controllers/programs/index.controller.ts';
-import { MotdProgram } from '@my-web3-app/motd/lib/instructions.ts';
+import a from '@my-web3-app/motd';
+a.MotdProgram;
 
 //initialize programs
 programsController.programs.forEach((entry) => {
-  if (entry.program instanceof MotdProgram) {
+  if (entry.program instanceof a.MotdProgram) {
     entry.program.initialize();
   }
 });

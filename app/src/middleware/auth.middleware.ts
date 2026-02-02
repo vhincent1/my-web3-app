@@ -9,7 +9,7 @@ const createSession = async (req, res, next) => {
 
   try {
     // User is authenticated, proceed to the next middleware or route handler
-    const account = accountRepository.findByIdentifier(userId);
+    const account = accountRepository.findById(userId);
     if (!account) {
       return res.status(401).send(`Account id=${userId} not found`);
     }

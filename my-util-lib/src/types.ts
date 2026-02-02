@@ -11,4 +11,4 @@ interface Commands {
   [key: string]: Command;
 }
 
-export { Command, Commands };
+export type { Command, Commands };

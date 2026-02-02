@@ -1,0 +1,15 @@
+{
+  "name": "@my-web3-app/app",
+  "version": "0.1.0",
+  "exports": "./src/app.ts",
+  "fmt": {
+    "semiColons": false
+  },
+  "tasks": {
+    "start": "NODE_ENV=production deno run --allow-env --allow-read --allow-ffi --allow-sys --allow-net --watch ./src/app.ts",
+    "start:dev": "NODE_ENV=development deno run --allow-env --allow-read --allow-ffi --allow-sys --allow-net --watch ./src/app.ts",
+    "test": "deno test",
+    "tools": "deno run scripts/run.ts",
+    "client:build": "terser app/src/lib/wallet-connector.js -o app/public/js/wallet-connector.min.js --compress"
+  }
+}

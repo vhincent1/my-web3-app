@@ -1,15 +1,16 @@
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, sendAndConfirmTransaction, SystemProgram, Transaction } from '@solana/web3.js';
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const GENERATE = false;
+const GENERATE = true;
 
 const loadKeypair = (filePath: string, print: boolean = false) => {
   if (!GENERATE) {
     console.error('Disabled: generate constant is set to false');
     return;
   }
+
   let secretKeyString: string | undefined;
   try {
     secretKeyString = fs.readFileSync(filePath, 'utf-8');
@@ -94,7 +95,7 @@ const keypairUtils = {
 
 async function withdraw(connection: Connection, from: Keypair, to: PublicKey, amount: number) {
   try {
-    console.log(`Attempting to withdraw ${amount} SOL from ${from.publicKey.toString()} to ${to.toString()}`);
+    console.info(`Attempting to withdraw ${amount} SOL from ${from.publicKey.toString()} to ${to.toString()}`);
 
     // Calculate lamports (1 SOL = 1,000,000,000 lamports)
     const lamportsToSend = amount * LAMPORTS_PER_SOL;
@@ -120,7 +121,7 @@ async function withdraw(connection: Connection, from: Keypair, to: PublicKey, am
     message += `View on Explorer: https://explorer.solana.com{signature}?cluster=${connection.rpcEndpoint}`;
     return message;
   } catch (error) {
-    console.error('Withdrawal failed:', error.message);
+    // console.error('Withdrawal failed:', error.message);
     throw error;
   }
 }
@@ -246,12 +247,74 @@ async function getTransactionLamports(connection: Connection, signature: string)
   }
 }
 
+async function getAllSignaturesForProgram(connection, programId) {
+  let signatures = [];
+  let options: any = { limit: 1000 };
+  let fetchedSignatures = [];
+
+  // Loop to handle the 1000 transaction limit
+  do {
+    fetchedSignatures = await connection.getSignaturesForAddress(programId, options);
+    signatures.push(...fetchedSignatures);
+
+    // If we fetched the maximum number, use the oldest signature as the 'before' cursor for the next request
+    if (fetchedSignatures.length === 1000) {
+      options.before = fetchedSignatures[fetchedSignatures.length - 1].signature;
+    }
+  } while (fetchedSignatures.length === 1000);
+
+  return signatures;
+}
+
+async function getTransactionDetails(connection, signatures, programId) {
+  // getParsedTransactions accepts an array of signatures (limit is usually around 10 per call)
+  const transactions = await connection.getParsedTransactions(
+    signatures.map((s) => s.signature),
+    {
+      maxSupportedTransactionVersion: 0, // Use version 0 for modern transactions
+    },
+  );
+
+  // Filter transactions to ensure they involve the correct program, as getSignaturesForAddress
+  // only guarantees the program's address was mentioned, not necessarily the *target* of an instruction
+  return transactions.filter((tx) => {
+    if (!tx || !tx.transaction.message.instructions) return false;
+    return tx.transaction.message.instructions.some((ix) => {
+      // For parsed instructions, programId will be a PublicKey
+      if (ix.programId.equals(programId)) return true;
+      // Handle legacy unparsed instructions if necessary
+      return false;
+    });
+  });
+}
+
+// async function main() {
+//     console.log(`Fetching signatures for program: ${programId.toBase58()}`);
+//     const signatures = await getAllSignaturesForProgram(programId);
+//     console.log(`Found ${signatures.length} transactions. Fetching details...`);
+
+//     // Process in batches due to potential RPC limits on getParsedTransactions
+//     const BATCH_SIZE = 10;
+//     const allTransactions = [];
+//     for (let i = 0; i < signatures.length; i += BATCH_SIZE) {
+//         const batchSignatures = signatures.slice(i, i + BATCH_SIZE);
+//         const transactions = await getTransactionDetails(batchSignatures);
+//         allTransactions.push(...transactions);
+//         console.log(`Fetched batch ${Math.ceil((i + BATCH_SIZE) / BATCH_SIZE)}/${Math.ceil(signatures.length / BATCH_SIZE)}`);
+//     }
+
+//     console.log(`Total transactions fetched and filtered: ${allTransactions.length}`);
+//     // You can now process allTransactions for specific instruction data
+//     // console.log(JSON.stringify(allTransactions[0], null, 2)); 
+// }
+
 const solanaUtils = {
   requestAirdrop,
   accountDetails,
   displayWalletTokens,
   getTransactionLamports,
-  withdraw
+  withdraw,
+  getAllSignaturesForProgram,
 };
 
 export { keypairUtils, solanaUtils };

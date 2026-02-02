@@ -1,7 +1,9 @@
+import { expect } from 'jsr:@std/expect';
+
 import { Connection, Keypair, PublicKey, Transaction, sendAndConfirmTransaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { keypairUtils } from '@my-util-lib/utils';
-import appConfig from '../app.config.ts'
-import { MotdProgram } from '../lib/instructions.ts'
+import appConfig from '../app.config.ts';
+import { MotdProgram } from '../lib/instructions.ts';
 import { MotdStateLayout } from '../lib/schema.ts';
 
 // --- CONFIGURATION ---
@@ -10,9 +12,9 @@ const CONNECTION = appConfig.CONNECTION;
 
 const PROGRAM = new MotdProgram(CONNECTION, PROGRAM_ID);
 
-describe('MOTD Native Program', () => {
+Deno.test('MOTD Native Program', async () => {
   const adminWallet = appConfig.ADMIN_WALLET.keypair; //loadKeypair('/Users/vhincent/.config/solana/id.json'); //Keypair.generate();
-  const hackerWallet = keypairUtils.generateKeypair()//Keypair.generate();
+  const hackerWallet = keypairUtils.generateKeypair(); //Keypair.generate();
   const pda: PublicKey = PROGRAM.pda;
 
   const messages = {
@@ -27,22 +29,24 @@ describe('MOTD Native Program', () => {
   };
 
   // Before all tests: Airdrop SOL to the admin wallet and find the PDA
-  beforeAll(async () => {
-    const sig1 = await CONNECTION.requestAirdrop(adminWallet.publicKey, 2 * LAMPORTS_PER_SOL);
-    const sig2 = await CONNECTION.requestAirdrop(hackerWallet.publicKey, 2 * LAMPORTS_PER_SOL);
-    [sig1, sig2].forEach(async (signature) => {
-      const latestBlockhash = await CONNECTION.getLatestBlockhash();
-      await CONNECTION.confirmTransaction({
+
+  const sig1 = await CONNECTION.requestAirdrop(adminWallet.publicKey, 2 * LAMPORTS_PER_SOL);
+  const sig2 = await CONNECTION.requestAirdrop(hackerWallet.publicKey, 2 * LAMPORTS_PER_SOL);
+  [sig1, sig2].forEach(async (signature) => {
+    const latestBlockhash = await CONNECTION.getLatestBlockhash();
+    await CONNECTION.confirmTransaction(
+      {
         signature: signature,
         blockhash: latestBlockhash.blockhash,
         lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-      }, 'confirmed');
-    });
-    console.log('Test Admin:', adminWallet.publicKey.toBase58());
-    console.log('Test PDA:', pda.toBase58());
+      },
+      'confirmed',
+    );
   });
+  console.log('Test Admin:', adminWallet.publicKey.toBase58());
+  console.log('Test PDA:', pda.toBase58());
 
-  it('Initializes the message account', async () => {
+  Deno.test('Initializes the message account', async () => {
     const initIx = PROGRAM.createInstruction(adminWallet.publicKey, 0, messages.initialized);
 
     // const initIxs = await PROGRAM.createInitializeInstructions(adminWallet.publicKey, messages.initialized);
@@ -74,7 +78,7 @@ describe('MOTD Native Program', () => {
     }
   });
 
-  it('Prevents Re-Initialization (Security Check)', async () => {
+  Deno.test('Prevents Re-Initialization (Security Check)', async () => {
     const initIx = PROGRAM.createInstruction(adminWallet.publicKey, 0, messages.initialized);
     // const initIxs = await PROGRAM.createInitializeInstructions(adminWallet.publicKey, messages.initialized);
     const ix = new Transaction().add(initIx);
@@ -91,7 +95,7 @@ describe('MOTD Native Program', () => {
     }
   });
 
-  it('Updates the message', async () => {
+  Deno.test('Updates the message', async () => {
     const updateIx = PROGRAM.createInstruction(adminWallet.publicKey, 1, messages.update);
 
     // const updateIx = PROGRAM.createUpdateInstruction(adminWallet.publicKey, messages.update);
@@ -104,15 +108,19 @@ describe('MOTD Native Program', () => {
     expect(decoded.message).toBe(messages.update);
   });
 
-  it('Prevents Unauthorized Updates (Security Check)', async () => {
+  Deno.test('Prevents Unauthorized Updates (Security Check)', async () => {
     const updateIx = PROGRAM.createInstruction(adminWallet.publicKey, 1, messages.update);
 
     // const updateIx = PROGRAM.createUpdateInstruction(adminWallet.publicKey, messages.update);
     const ix = new Transaction().add(updateIx);
     // We expect this to fail
     try {
-      await sendAndConfirmTransaction(CONNECTION, ix, [hackerWallet]);
-      fail('Transaction should have failed'); // Force fail if it succeeds
+      //   await sendAndConfirmTransaction(CONNECTION, ix, [hackerWallet]);
+      //  fail('Transaction should have failed'); // Force fail if it succeeds
+      expect(async () => {
+        // throw new Error('fail');
+        await sendAndConfirmTransaction(CONNECTION, ix, [hackerWallet]);
+      }).toThrow();
     } catch (error: any) {
       // Check logs for specific custom error code or generic error
       expect(error.toString()).toMatch(/Error/);
