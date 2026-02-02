@@ -1,9 +1,11 @@
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, sendAndConfirmTransaction, SystemProgram, Transaction } from '@solana/web3.js';
 import fs from 'fs';
 import path from 'path';
 
-const GENERATE = false;
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, sendAndConfirmTransaction, SystemProgram, Transaction } from '@solana/web3.js';
+
+
+const GENERATE = true;
 
 const loadKeypair = (filePath: string, print: boolean = false) => {
   if (!GENERATE) {
