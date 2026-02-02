@@ -26,10 +26,10 @@
     "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.3",
     "micro-ed25519-hdkey": "^0.1.2",
-    "motd": "link:@my-web3-app/motd",
     "path": "^0.12.7",
     "tsx": "^4.21.0",
     "tweetnacl": "^1.0.3",
+    "motd": "link:@my-web3-app/motd",
     "utils": "link:@my-util-lib/utils"
   },
   "devDependencies": {

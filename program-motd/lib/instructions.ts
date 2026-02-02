@@ -20,7 +20,7 @@ export class MotdProgram {
   }
 
   async initialize() {
-    console.log('[MotdProgram] initialize')
+    console.log('[MotdProgram]: initialize');
     const state = await this.update();
     this.state = state;
   }
@@ -28,7 +28,7 @@ export class MotdProgram {
   errorCodes = () => {};
 
   async update(): Promise<MotdState> {
-    console.log('[MotdProgram] update')
+    console.log('[MotdProgram]: update');
     try {
       if (!(await this.connection.getAccountInfo(this.programId))) {
         return { is_initialized: false, admin: PublicKey.default, message: 'Program not found', stage: 0 };
@@ -60,7 +60,7 @@ export class MotdProgram {
     if (variant > 1) result = { valid: false, error: 'Invalid variant: 0 = Initialize, 1 = Update' };
     if (msg.length === 0) result = { valid: false, error: 'Message cannot be empty.' };
     if (msg.length > 512) result = { valid: false, error: 'Message is too long (max 512).' };
-    if (throwError && !result.valid) throw new Error('validateMessage: '+result.error);
+    if (throwError && !result.valid) throw new Error('validateMessage: ' + result.error);
     return result;
   };
 
@@ -116,7 +116,7 @@ export class MotdProgram {
     try {
       const checkMessage = this.validateMessage(type, message, true);
       if (!checkMessage.valid) return { status: checkMessage.error };
-      
+
       // console.log('Update check')
       const state = await this.update();
       if (!state.is_initialized) return { status: state.message };
