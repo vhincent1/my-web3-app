@@ -1,7 +1,7 @@
-<%- include('./partials/header', {title: 'Login'}) %>
-<div class="container" id="login">
-  <h3>Login</h3>
-  <form action="/login" method="POST">
+<%- include('./partials/header', {title: 'Register'}) %>
+<div class="container" id="register">
+  <h3>Register</h3>
+  <form action="/register" method="POST">
     <div>
       <label for="username">Username:</label>
       <input type="text" id="username" name="username" required>
@@ -10,7 +10,7 @@
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required>
     </div>
-    <button type="submit">Sign-in</button>
+    <button type="submit">Create Account</button>
   </form>
 </div>
 <br>

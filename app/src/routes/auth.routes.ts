@@ -2,13 +2,10 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 
 import { authMiddleware } from '../middleware/auth.middleware.ts';
-import AccountRepository from '../controllers/accounts/AccountRepository.ts';
 import { accountRepository } from '../controllers/accounts/index.accounts.ts';
 import bcrypt from 'bcryptjs';
 
 const router = express.Router();
-
-process.env.TOKEN_SECRET = 'token-secret';
 
 // A simple in-memory store for session data
 const userSessions: any = {}; //pendingSignatures
@@ -31,6 +28,8 @@ router.post('/', async (req, res) => {
       req.session.token = token;
 
       console.log('Success');
+
+      delete req.session?.status;
       res.status(200).redirect('/dashboard');
     } else {
       res.status(401).render('login', { status: 'Error: Invalid password' });
@@ -41,7 +40,16 @@ router.post('/', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  res.render('login');
+  res.render('login', { status: req.session?.status });
+});
+
+router.post('/logout', async (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).render('login', { status: 'Could not log out, please try again' });
+    }
+    res.status(200).render('login', { status: 'Logged out successfully' });
+  });
 });
 
 router.get('/protected-route', authMiddleware, async (req, res) => {

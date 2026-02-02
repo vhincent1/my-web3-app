@@ -9,20 +9,10 @@ export default class AccountRepository {
     this.#accounts = initialAccounts;
   }
 
-  authenticate = (identifier: string, password: string) => {
-    const account = this.#accounts.find((acc) => acc.identifier == identifier);
-    if (!account) return null;
+  getAccounts = () => this.#accounts;
 
-    if (account.password == password) {
-      return account;
-    } else {
-      return null;
-    }
-  };
-
-  findByIdentifier = (identifier: string) => this.#accounts.find((acc) => acc.identifier === identifier) ?? null;
-  findById = (id: number) => this.#accounts.find((acc) => acc.id == id) ?? null;
-  getAccounts = () => Object.freeze(this.#accounts.slice());
+  findById = (id: number | string) => this.#accounts.find((acc) => acc.id === id);
+  findByIdentifier = (id: string) => this.#accounts.find((acc) => acc.identifier === id);
 
   getFreeId = () => {
     const taken = new Set(this.#accounts.map((acc) => acc.id));
@@ -31,22 +21,8 @@ export default class AccountRepository {
     return id;
   };
 
-  async register(username: string, password: string) {
-    const exists = this.findByIdentifier(username);
-    if (exists) throw Error('Exisiting identifier');
-
-    const hash = await bcrypt.hash(password, 10);
-    const account = new Account(this.getFreeId(), username, hash);
-
-    // update account list
-    const updatedAccounts = this.#accounts.concat(account);
-
-    const { id, identifier } = account;
-    console.log(`Register Account[id=${id}, identifier=${identifier}]`);
-
-    // this.#accounts.push(account);
-    this.#accounts = updatedAccounts;
-    return account;
+  save(account: Account) {
+    this.#accounts = this.#accounts.concat(account);
   }
 
   update(update: Account, updates: any) {

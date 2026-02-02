@@ -3,12 +3,43 @@ import * as bip39 from 'bip39';
 import { HDKey } from 'micro-ed25519-hdkey';
 import { Connection, Keypair, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
+// interface AccountI {
+//   id: number;
+//   identifier: string;
+//   password: string;
+
+//   //inbox
+//   messages: string[];
+
+//   wallet: {
+//     freeze: boolean;
+//     mnemonic: string;
+//     generated: number;
+//     addresses: Array<{ keypair: Keypair; balance: number }>;
+//   };
+// }
+
+export interface Message {
+  sender: number;
+  title: string;
+  content: string;
+
+  inbox?: number; // 0 inbox, 1 sent, 2 archive, 3 trash
+  read?: boolean;
+  timestamp?: Date;
+}
+
 export default class Account {
   id: number;
   identifier: string;
   password: string;
+  role: number = 1;
+
+  //inbox
+  messages: Message[] = [];
 
   #wallet: {
+    freeze: boolean;
     mnemonic: string;
     generated: number;
     addresses: Array<{ keypair: Keypair; balance: number }>;
@@ -20,12 +51,14 @@ export default class Account {
     this.password = password;
 
     this.#wallet = {
+      freeze: false,
       mnemonic: bip39.generateMnemonic(),
       generated: 1,
       addresses: [],
     };
-    // console.log('')
   }
+
+  getWallet = () => this.#wallet;
 
   getKeypair = (index = 0) => {
     const path = `m/44'/501'/${index}'/0'`;
@@ -41,9 +74,9 @@ export default class Account {
     return keypair;
   };
 
-  #getKeypairs = () => Array.from({ length: this.#wallet.generated }, (_, i) => this.getKeypair(i));
+  getKeypairs = () => Array.from({ length: this.#wallet.generated }, (_, i) => this.getKeypair(i));
 
-  findKeypair = (targetAddress, maxSearch = 100) => {
+  findKeypair = (targetAddress: string, maxSearch = 100) => {
     for (let i = 0; i < maxSearch; i++) {
       const keypair = this.getKeypair(i);
       if (keypair.publicKey.toBase58() === targetAddress) {
@@ -54,52 +87,7 @@ export default class Account {
     throw new Error('Address not found within the search limit.');
   };
 
-  getAccountWithABalance() {
-    const addresses = this.#wallet.addresses;
-    if (addresses.length === 0) return null; // Handle empty array
-    const address = addresses.reduce((prev, current) => (prev.balance > current.balance ? prev : current));
-    return { keypair: address.keypair, balance: address.balance };
-  }
-
-  getWallet() {
-    return {
-      generateKeypair: () => {
-        console.log('generating keypair for userId=', this.id);
-        this.#wallet.generated += 1;
-      },
-      ...this.#wallet,
-      findByAddress: (addr) => this.#wallet.addresses.find((key) => key.keypair.publicKey == addr),
-    };
-  }
-
-  getBalances() {
-    return {
-      total: this.#wallet.addresses.reduce((sum, acc) => sum + acc.balance, 0),
-
-      update: async () => {
-        // console.log('update accounts');
-        // 1. Extract all Public Keys
-        const pubKeys = this.#getKeypairs().map((keypair) => keypair.publicKey);
-        let accounts = [];
-        try {
-          // 2. Fetch all data in ONE request
-          const infos = await appConfig.CONNECTION.getMultipleAccountsInfo(pubKeys);
-          // 3. Map to your desired format
-          accounts = infos
-            .map((info, index) => ({
-              keypair: this.#getKeypairs()[index],
-              balance: info ? info.lamports / LAMPORTS_PER_SOL : 0,
-            })) // highest to lowest
-            .sort((a, b) => b.balance - a.balance);
-        } catch (error) {
-          accounts = this.#getKeypairs()
-            .slice(0, this.#wallet.generated)
-            .map((keypair, index) => ({ keypair, balance: 0 }));
-        }
-        this.#wallet.addresses = accounts;
-      },
-    };
-  }
+  getTotalBalance = () => this.#wallet.addresses.reduce((sum, acc) => sum + acc.balance, 0);
 }
 
 // const acc = { id: 1, identifier: '', keypairs: [Keypair.generate()] };

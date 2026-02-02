@@ -4,7 +4,7 @@ import { checkField, keypairUtils } from '@my-util-lib/utils';
 
 import { authMiddleware } from '../../middleware/auth.middleware.ts';
 import { addApiRoute } from '../../routes/api.routes.ts';
-import { accountRepository } from './index.accounts.ts';
+import { accountRepository, accountService } from './index.accounts.ts';
 import { solanaUtils } from '@my-util-lib/utils';
 import appConfig from '../../../app.config.ts';
 
@@ -54,7 +54,7 @@ function initialize(path) {
     const status = req.session.status;
     delete req.session.status;
 
-    const a = await account.getAccountWithABalance();
+    // const a = await account.getAccountWithABalance();
 
     // console.log('account with balance:', a);
 
@@ -79,16 +79,15 @@ function initialize(path) {
       checkField(recipient, 'recipient');
       checkField(amount, 'amount');
 
-      const wallet = account.getWallet().findByAddress(address);
-      if (!wallet) {
-        throw Error('address not found in wallet');
-      } else if (wallet.balance < amount) {
-        throw Error('invalid balance');
-      } else {
-        console.log('send');
-        const result = await solanaUtils.withdraw(appConfig.CONNECTION, wallet.keypair, recipient, amount);
-        req.session.status = result;
-      }
+      //account Service
+      // const wallet = account.getWallet().findByAddress(address);
+      // if (!wallet) throw Error('address not found in wallet');
+
+      // checkField(wallet.balance, 'invalid balance', wallet.balance < amount);
+
+      // console.log('send');
+      // const result = await solanaUtils.withdraw(appConfig.CONNECTION, wallet.keypair, recipient, amount);
+      // req.session.status = result;
     } catch (err) {
       // console.log(err);
       statusCode = 400;
@@ -107,16 +106,17 @@ function initialize(path) {
 
     res.status(statusCode).redirect(`withdraw?${addressQuery}${recipientQuery}&${amountQuery}`);
   });
-  /** -------------- */
+
+  /* Generate Address */
   addApiRoute('/account/generate-address', 'POST', authMiddleware, async (req, res) => {
     const account = req.account;
     // const userId = req.session.user.userId; //req.body.userId; // Access the data from the form
 
     console.log(`Server action performed for User ID: ${account.id}`);
 
-    // const account = accountRepository.findById(userId) //getAccounts().find((acc) => acc.id == req.session.user.userId);
     if (account) {
-      account.getWallet().generateKeypair();
+      // account.getWallet().generateKeypair();
+      accountService.generateKeypair(account.id)
     }
     // Perform your server-side logic here (e.g., database update)
 

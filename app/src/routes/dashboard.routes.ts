@@ -22,7 +22,6 @@ app.get('/', async (req, res) => {
   // console.log('current tab:', req.session.tab);
 
   const account = req.account;
-  console.log('acc:', account);
   // await account.getBalances().update(); //TODO: try catch error
 
   // const redirectTo = req.session.returnTo || '/';
@@ -38,7 +37,6 @@ app.get('/', async (req, res) => {
   // delete req.session.tab;
 
   const tab = req.query.tab;
-  console.log('tab:', tab);
 
   return res.render('dashboard', {
     title: 'Dashboard',

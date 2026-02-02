@@ -1,5 +1,7 @@
 import { Connection } from '@solana/web3.js';
 
+process.env.TOKEN_SECRET = 'token-secret';
+
 const CONNECTION = new Connection('http://thinkpadx270:8899', 'confirmed');
 
 // keypairs

@@ -6,6 +6,8 @@ import { ProgramEntry, programsController } from './index.controller.ts';
 import { authMiddleware } from '../../middleware/auth.middleware.ts';
 import { addApiRoute } from '../../routes/api.routes.ts';
 
+import { accountService } from '../accounts/index.accounts.ts';
+
 const PROGRAM_ID = new PublicKey('8pRUcpXfWot7uhCyF8pH4ebz48hReW83VXwPzSh14DKy');
 
 const MessageOfTheDayProgram = new mySolanaProgram.MotdProgram(appConfig.CONNECTION, PROGRAM_ID);
@@ -44,7 +46,8 @@ addApiRoute(PROGRAM_ENTRY.apiRoutes.update.path, PROGRAM_ENTRY.apiRoutes.read.ty
   const program = programsController.findByAlias(PROGRAM_ENTRY.alias).program;
 
   try {
-    const payer = await account.getAccountWithABalance();
+    const payer = accountService.getAccountWithABalance(account.id); // TODO: update
+
     if (!payer || payer.balance === 0) {
       console.log('Invalid payer');
       throw Error(!payer ? 'no addresses found' : 'empty balance');

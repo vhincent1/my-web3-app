@@ -1,6 +1,6 @@
 <% if (account) {
   const addresses = account.getWallet().addresses || [];
-  const total = account.getBalances().total;
+  const total = account.getTotalBalance(); //account.getBalances().total;
 %>
 <div class="container" id="account">
   <h3>Account</h3>
