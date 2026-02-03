@@ -1,12 +1,12 @@
 import express from 'express';
 
-import { checkField, keypairUtils } from '@my-util-lib/utils';
+import { checkField, type keypairUtils } from '@my-util-lib/utils';
 
 import { authMiddleware } from '../../middleware/auth.middleware.ts';
 import { addApiRoute } from '../../routes/api.routes.ts';
-import { accountRepository, accountService } from './index.accounts.ts';
-import { solanaUtils } from '@my-util-lib/utils';
-import appConfig from '../../../app.config.ts';
+import { type accountRepository, accountService } from './index.accounts.ts';
+import type { solanaUtils } from '@my-util-lib/utils';
+import type appConfig from '../../../app.config.ts';
 
 const router = express.Router();
 
@@ -75,9 +75,13 @@ function initialize(path) {
 
     let statusCode = 200;
     try {
-      checkField(address, 'address');
-      checkField(recipient, 'recipient');
-      checkField(amount, 'amount');
+      // checkField(address, 'address');
+      // checkField(recipient, 'recipient');
+      // checkField(amount, 'amount');
+
+      // const wallet = account.findKeypair(address);
+      // if (!wallet) throw Error('address not found in wallet');
+      const result = await accountService.withdraw(account, address, recipient, amount);
 
       //account Service
       // const wallet = account.getWallet().findByAddress(address);
@@ -87,7 +91,7 @@ function initialize(path) {
 
       // console.log('send');
       // const result = await solanaUtils.withdraw(appConfig.CONNECTION, wallet.keypair, recipient, amount);
-      // req.session.status = result;
+      req.session.status = result;
     } catch (err) {
       // console.log(err);
       statusCode = 400;
@@ -100,11 +104,11 @@ function initialize(path) {
     //   recipient,
     //   amount,
     // });
-    const addressQuery = `${address !== 'undefined' ? `?address=${recipient}` : ''}`;
+    const addressQuery = `${address !== 'undefined' ? `?address=${address}` : ''}`;
     const recipientQuery = `${recipient !== 'undefined' ? `&recipient=${recipient}` : ''}`;
     const amountQuery = `${amount !== 'undefined' ? `&amount=${amount}` : ''}`;
 
-    res.status(statusCode).redirect(`withdraw?${addressQuery}${recipientQuery}&${amountQuery}`);
+    res.status(statusCode).redirect(`withdraw${addressQuery}${recipientQuery}&${amountQuery}`);
   });
 
   /* Generate Address */
@@ -116,7 +120,7 @@ function initialize(path) {
 
     if (account) {
       // account.getWallet().generateKeypair();
-      accountService.generateKeypair(account.id)
+      accountService.generateKeypair(account.id);
     }
     // Perform your server-side logic here (e.g., database update)
 

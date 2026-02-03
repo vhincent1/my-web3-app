@@ -11,5 +11,11 @@
     "test": "deno test --allow-env --allow-read --allow-write --allow-net",
     "tools": "deno run scripts/run.ts",
     "client:build": "terser app/src/lib/wallet-connector.js -o app/public/js/wallet-connector.min.js --compress"
-  }
+  },
+  "include": [
+    "app.config.ts",
+    "src/**/*",
+    "scripts/*",
+    "tests/*"
+  ]
 }

@@ -60,37 +60,38 @@
 // console.info();
 
 // withdraw
-// import { accountRepository, accountService } from './src/controllers/accounts/index.accounts.ts';
-// const account = accountRepository.findById(0);
+import { accountRepository, accountService } from './src/controllers/accounts/index.accounts.ts';
+const account = accountRepository.findById(0);
 
-// import { solanaUtils } from '@my-util-lib/utils';
-// import appConfig from './app.config.ts';
+import { solanaUtils } from '@my-util-lib/utils';
+import appConfig from './app.config.ts';
 
-// const address1 = account?.getKeypair(0).publicKey;
-// const address2 = account?.getKeypair(1).publicKey;
+const address1 = account?.getKeypair(0).publicKey;
+const address2 = account?.getKeypair(1).publicKey;
 
-// await Promise.resolve(solanaUtils.requestAirdrop(appConfig.CONNECTION, address1!!, 1));
+await Promise.resolve(solanaUtils.requestAirdrop(appConfig.CONNECTION, address1!!, 1));
 
-// setTimeout(async () => {
-//   // console.log(address1, address2);
+setTimeout(async () => {
+  // console.log(address1, address2);
 
-//   const result = await accountService.withdraw(account, address1?.toBase58(), address2?.toBase58(), 0.2);
-//   console.log('RESULT:', result);
-// }, 2 * 1000);
+  const result = await accountService.withdraw(account, address1?.toBase58(), address2?.toBase58(), 0.2);
+  console.log('RESULT:', result);
+}, 2 * 1000);
 
-import fs from 'fs';
-import path from 'node:path';
 
-const __dirname = path.resolve();
+// import fs from 'fs';
+// import path from 'node:path';
 
-const packagePath = path.join(__dirname, 'package.json');
-const packageString = fs.readFileSync(packagePath, 'utf8');
-const packageData = JSON.parse(packageString);
+// const __dirname = path.resolve();
 
-Object.keys(packageData.dependencies).forEach((dep) => {
-  console.log('deno add npm:' + dep);
-});
+// const packagePath = path.join(__dirname, 'package.json');
+// const packageString = fs.readFileSync(packagePath, 'utf8');
+// const packageData = JSON.parse(packageString);
 
-Object.keys(packageData.devDependencies).forEach((dep) => {
-  console.log('deno add npm:' + dep);
-});
+// Object.keys(packageData.dependencies).forEach((dep) => {
+//   console.log('deno add npm:' + dep);
+// });
+
+// Object.keys(packageData.devDependencies).forEach((dep) => {
+//   console.log('deno add npm:' + dep);
+// });

@@ -1,7 +1,7 @@
-import { Connection, Keypair, clusterApiUrl, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
-import { getMint, createMint, getOrCreateAssociatedTokenAccount, mintTo, TOKEN_PROGRAM_ID, transfer } from '@solana/spl-token';
+import { Connection, type Keypair, type clusterApiUrl, type LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import { getMint, createMint, getOrCreateAssociatedTokenAccount, mintTo, type TOKEN_PROGRAM_ID, transfer } from '@solana/spl-token';
 
-import { loadKeypair } from './keypair';
+import type { loadKeypair } from './keypair';
 
 const connection = new Connection('http://thinkpadx270:8899', 'confirmed');
 

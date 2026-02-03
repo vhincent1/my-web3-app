@@ -1,4 +1,5 @@
 import { Connection } from '@solana/web3.js';
+import process from "node:process";
 
 process.env.TOKEN_SECRET = 'token-secret';
 

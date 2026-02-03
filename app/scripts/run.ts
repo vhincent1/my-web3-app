@@ -2,6 +2,7 @@ import { OWNER_KEYPAIR_PATH, USER_KEYPAIR_PATH } from '../app.config.ts';
 import { Connection } from '@solana/web3.js';
 import { createSolanaToken, sendSPLTokens } from './createToken.ts';
 import { keypairUtils, solanaUtils, parseArgs } from '@my-util-lib/utils';
+import process from "node:process";
 
 const connection = new Connection('http://thinkpadx270:8899', 'confirmed');
 const getArg = (index: number, fallback?: string) => process.argv[index] || fallback;

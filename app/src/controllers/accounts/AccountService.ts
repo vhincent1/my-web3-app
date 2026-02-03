@@ -1,7 +1,7 @@
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import appConfig from '../../../app.config.ts';
-import AccountRepository from './AccountRepository.ts';
-import Account, { Message } from './Account.ts';
+import type AccountRepository from './AccountRepository.ts';
+import Account, { type Message } from './Account.ts';
 import bcrypt from 'bcryptjs';
 import { checkField, solanaUtils } from '@my-util-lib/utils';
 
@@ -144,7 +144,7 @@ export class AccountService {
   }
 
   generateKeypair = (identifier) => {
-    const account = this.repo.findByIdentifier(identifier);
+    const account = this.repo.findById(identifier);
     console.log('generating keypair for account id=', account.id);
     account.getWallet().generated += 1;
   };

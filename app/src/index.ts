@@ -10,7 +10,8 @@ import apiRoutes from './routes/api.routes.ts';
 import authRoute from './routes/auth.routes.ts';
 import registerRoute from './routes/register.routes.ts';
 import dashboardRoute from './routes/dashboard.routes.ts';
-import { accountRepository, accountService } from './controllers/accounts/index.accounts.ts';
+import { accountRepository, type accountService } from './controllers/accounts/index.accounts.ts';
+import process from "node:process";
 
 const app = express();
 
@@ -50,7 +51,7 @@ if (appConfig.ENVIRONMENT.developement || appConfig.ENVIRONMENT.test) {
   // console.log('address:',address)
   // await Promise.resolve(await solanaUtils.requestAirdrop(appConfig.CONNECTION, address.keypair.publicKey, 1));
 
-  app.use(async (req, res, next) => {
+  app.use((req, res, next) => {
     //debug temporary session
     const user = { userId: debugAccount.id, publicKey: debugAccount.identifier };
     req.session.token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: '1h' });

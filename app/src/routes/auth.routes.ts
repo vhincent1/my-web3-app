@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { authMiddleware } from '../middleware/auth.middleware.ts';
 import { accountRepository } from '../controllers/accounts/index.accounts.ts';
 import bcrypt from 'bcryptjs';
+import process from "node:process";
 
 const router = express.Router();
 

@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 import { accountRepository, accountService } from '../controllers/accounts/index.accounts.ts';
+import process from "node:process";
 
 const createSession = async (req, res, next) => {
   const { userId, publicKey } = req.session.user;

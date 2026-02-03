@@ -1,7 +1,7 @@
-import appConfig from '../../../app.config.ts';
+import type appConfig from '../../../app.config.ts';
 import * as bip39 from 'bip39';
 import { HDKey } from 'micro-ed25519-hdkey';
-import { Connection, Keypair, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { type Connection, Keypair, type PublicKey, type LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 // interface AccountI {
 //   id: number;

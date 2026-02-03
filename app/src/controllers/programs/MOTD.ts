@@ -1,8 +1,8 @@
 import appConfig from '../../../app.config.ts';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { type Connection, PublicKey } from '@solana/web3.js';
 import mySolanaProgram from '@my-web3-app/motd';
 
-import { ProgramEntry, programsController } from './index.controller.ts';
+import { type ProgramEntry, programsController } from './index.controller.ts';
 import { authMiddleware } from '../../middleware/auth.middleware.ts';
 import { addApiRoute } from '../../routes/api.routes.ts';
 

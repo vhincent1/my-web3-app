@@ -11,7 +11,7 @@
     "test": "deno test --allow-env --allow-read --allow-write --allow-net",
     "program:build": "bash ./build-program.sh",
     "program:deploy": "bash ./deploy-program.sh",
-    "program:size": "du -A -B 1 program/target/deploy/motd.so",
+    "program:size": "du -A -B 1 program/target/deploy/motd.so"
   },
   "imports": {
     "@coral-xyz/borsh": "npm:@coral-xyz/borsh@^0.32.1",

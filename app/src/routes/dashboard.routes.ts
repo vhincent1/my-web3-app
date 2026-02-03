@@ -1,13 +1,13 @@
 import express from 'express';
 
-import { Connection, PublicKey } from '@solana/web3.js';
-import mySolanaProgram from '@my-web3-app/motd';
+import type { Connection, PublicKey } from '@solana/web3.js';
+import type mySolanaProgram from '@my-web3-app/motd';
 
 import { programsController } from '../controllers/programs/index.controller.ts';
-import { accountRepository } from '../controllers/accounts/index.accounts.ts';
+import type { accountRepository } from '../controllers/accounts/index.accounts.ts';
 import AccountController from '../controllers/accounts/AccountController.ts';
-import { addApiRoute } from './api.routes.ts';
-import { authMiddleware } from '../middleware/auth.middleware.ts';
+import type { addApiRoute } from './api.routes.ts';
+import type { authMiddleware } from '../middleware/auth.middleware.ts';
 
 const app = express.Router();
 

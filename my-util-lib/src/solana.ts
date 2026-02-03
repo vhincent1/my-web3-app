@@ -121,7 +121,7 @@ async function withdraw(connection: Connection, from: Keypair, to: PublicKey, am
     message += `View on Explorer: https://explorer.solana.com{signature}?cluster=${connection.rpcEndpoint}`;
     return message;
   } catch (error) {
-    // console.error('Withdrawal failed:', error.message);
+    console.error('Withdrawal failed:', error.message);
     throw error;
   }
 }

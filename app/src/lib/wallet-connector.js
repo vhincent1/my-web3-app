@@ -8,7 +8,7 @@ const walletHeaderDiv = document.getElementById('wallet-header');
 const walletButtonETH = document.getElementById('wallet-button-eth');
 const walletButtonSOL = document.getElementById('wallet-button-sol');
 
-window.addEventListener('load', function () {
+globalThis.addEventListener('load', function () {
   const updateNetwork = (network) => (walletHeaderDiv.textContent = `Connect Your ${network} Wallet`);
   const initStyle = (div = walletHeaderDiv) => {
     div.style.margin = '-9px';
@@ -34,23 +34,23 @@ window.addEventListener('load', function () {
 let pubKey;
 let userData;
 authButton.addEventListener('click', async () => {
-  if (window.ethereum) {
-    await authenticateWallet(window.provider);
+  if (globalThis.ethereum) {
+    await authenticateWallet(globalThis.provider);
   } else {
-    await authenticateWallet(window.provider);
+    await authenticateWallet(globalThis.provider);
   }
 });
 
 const wallet = {
   ETH: {
     connect: async () => {
-      if (!window.ethereum) {
+      if (!globalThis.ethereum) {
         console.log('window not eth');
         return;
       }
       try {
         // 1. Create a BrowserProvider for the user's wallet
-        const provider = new ethers.BrowserProvider(window.ethereum);
+        const provider = new ethers.BrowserProvider(globalThis.ethereum);
 
         // 2. Request accounts from the user (prompts MetaMask)
         const accounts = await provider.send('eth_requestAccounts', []);
@@ -74,7 +74,7 @@ const wallet = {
   SOL: {
     connect: async () => {
       try {
-        const provider = window.solana;
+        const provider = globalThis.solana;
         // Request permission to connect to the wallet
 
         if (provider.isPhantom) {
@@ -144,8 +144,8 @@ const authenticateWallet = async (provider) => {
   try {
     let apiResponse;
 
-    if (window.ethereum) {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+    if (globalThis.ethereum) {
+      const provider = new ethers.BrowserProvider(globalThis.ethereum);
 
       // 2. Request accounts from the user (prompts MetaMask)
       const accounts = await provider.send('eth_requestAccounts', []);
@@ -171,8 +171,8 @@ const authenticateWallet = async (provider) => {
         body: JSON.stringify({ network: 'Ethereum', message, signature, publicKey }),
       });
       apiResponse = await verifyResponse.json();
-    } else if (window.solana) {
-      const provider = window.solana;
+    } else if (globalThis.solana) {
+      const provider = globalThis.solana;
       const publicKey = pubKey; //provider.publicKey.toString();
 
       // 1. Get a message to sign from the backend
@@ -211,7 +211,7 @@ const authenticateWallet = async (provider) => {
       statusDiv.textContent = 'Successful';
       // // updateUI(publicKey);
       // updateUI(apiResponse);
-      window.location.href = '/dashboard';
+      globalThis.location.href = '/dashboard';
     } else {
       updateUI(null);
       statusDiv.textContent = 'Failed';
@@ -305,8 +305,8 @@ const closeAccountsDisplay = (verificationResult) => {
 
 const updateUI = (verificationResult) => {
   console.log('updateUI');
-  if (window.ethereum) {
-  } else if (window.solana) {
+  if (globalThis.ethereum) {
+  } else if (globalThis.solana) {
     closeAccountsDisplay(verificationResult);
   }
 };

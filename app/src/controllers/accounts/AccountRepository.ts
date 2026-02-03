@@ -1,5 +1,5 @@
-import bcrypt from 'bcryptjs';
-import Account from './Account.ts';
+import type bcrypt from 'bcryptjs';
+import type Account from './Account.ts';
 
 export default class AccountRepository {
   #accounts: Account[];

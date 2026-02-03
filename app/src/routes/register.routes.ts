@@ -1,5 +1,5 @@
 import express from 'express';
-import { accountService, accountRepository } from '../controllers/accounts/index.accounts.ts';
+import { accountService, type accountRepository } from '../controllers/accounts/index.accounts.ts';
 
 const router = express.Router();
 
