@@ -1,5 +1,6 @@
-import app from '../src/index.ts';
-import request from 'supertest';
+import { expect } from '@std/expect';
+import { describe, it } from '@std/testing/bdd';
+
 import { accountService, accountRepository } from '../src/controllers/accounts/index.accounts.ts';
 import { Message } from '../src/controllers/accounts/Account.ts';
 import bcrypt from 'bcryptjs';

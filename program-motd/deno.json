@@ -6,14 +6,12 @@
     "./lib": "./lib/instructions.ts"
   },
   "tasks": {
-    "dev": "deno run --watch main.ts",
     "start": "NODE_ENV=production deno run --allow-env --allow-read --allow-ffi --allow-sys --allow-net scripts/run.ts",
     "start:dev": "NODE_ENV=development deno run--allow-env --allow-read --allow-ffi --allow-sys --allow-net --watch scripts/run.ts",
     "test": "deno test --allow-env --allow-read --allow-write --allow-net",
-    "program:build": "agave-install init stable\n cd program\ncargo build-sbf --features debug",
-    "program:deploy": "agave-install init 2.2.9\n solana airdrop 1\nsolana program deploy program/target/deploy/motd.so --program-id ./config/program-keypair.json",
+    "program:build": "bash ./build-program.sh",
+    "program:deploy": "bash ./deploy-program.sh",
     "program:size": "du -A -B 1 program/target/deploy/motd.so",
-    "program:test": "yarn run jest tests/motd.test.ts"
   },
   "imports": {
     "@coral-xyz/borsh": "npm:@coral-xyz/borsh@^0.32.1",
