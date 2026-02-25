@@ -1,0 +1,29 @@
+[package]
+name = "spl-minter"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+debug = []
+# https://docs.solana.com/developing/on-chain-programs/developing-rust#project-layout
+#
+# When toggled on this feature will cause the crate to not compile a
+# bpf entrypoint.
+#
+# See the corresponding `#[cfg(not(feature = "exclude_entrypoint"))]`
+# in lib.rs. This is needed so that other Solana programs can import
+# helper functions from this library without causing symbol conflicts
+# with our entrypoint.
+exclude_entrypoint = []
+custom-heap = []
+custom-panic = []
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "spl-minter"            # This will determine the filename (motd.so)
+
+[dependencies]
+solana-program = "3.0.0"
+spl-token = "4.0.0"
+mpl-token-metadata = "5.1.0" # Metaplex Metadata crate
+borsh = "1.6"

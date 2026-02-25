@@ -45,7 +45,7 @@ const router = express.Router();
 //   });
 // });
 
-function initialize(path) {
+function initialize(redirectTo: string) {
   /** withdraw form */
   addApiRoute('/account/withdraw', 'GET', authMiddleware, async (req, res) => {
     const { address, recipient, amount } = req.query;
@@ -61,6 +61,7 @@ function initialize(path) {
     res.render('account/withdraw', {
       title: 'Withdraw form',
       status,
+      // form
       address: address,
       recipient: recipient,
       amount: amount,
@@ -74,28 +75,21 @@ function initialize(path) {
     console.log('req:', req.body);
 
     let statusCode = 200;
+    const response = (code, message) => {
+      statusCode = code;
+      req.session.status = message;
+    };
+
+    // let statusCode = 200;
     try {
-      // checkField(address, 'address');
-      // checkField(recipient, 'recipient');
-      // checkField(amount, 'amount');
-
-      // const wallet = account.findKeypair(address);
-      // if (!wallet) throw Error('address not found in wallet');
       const result = await accountService.withdraw(account, address, recipient, amount);
-
-      //account Service
-      // const wallet = account.getWallet().findByAddress(address);
-      // if (!wallet) throw Error('address not found in wallet');
-
-      // checkField(wallet.balance, 'invalid balance', wallet.balance < amount);
-
-      // console.log('send');
-      // const result = await solanaUtils.withdraw(appConfig.CONNECTION, wallet.keypair, recipient, amount);
       req.session.status = result;
+      response(200, result);
     } catch (err) {
       // console.log(err);
-      statusCode = 400;
-      req.session.status = 'Error: ' + err.message;
+      // statusCode = 400;
+      // req.session.status = 'Error: ' + err.message;
+      response(400, (err as Error).message);
     }
 
     // return res.render('account/withdraw', {
@@ -112,7 +106,7 @@ function initialize(path) {
   });
 
   /* Generate Address */
-  addApiRoute('/account/generate-address', 'POST', authMiddleware, async (req, res) => {
+  addApiRoute('/account/generate-address', 'POST', authMiddleware, (req, res) => {
     const account = req.account;
     // const userId = req.session.user.userId; //req.body.userId; // Access the data from the form
 
@@ -128,12 +122,12 @@ function initialize(path) {
     //   delete req.session.returnTo; // Clean up the session variable
 
     //   console.log('post redir: ', redirectTo);
-    res.redirect(path);
+    res.redirect(redirectTo);
   });
 }
 
 const accountController = {
-  init: initialize,
+  initialize,
 };
 
 export default accountController;

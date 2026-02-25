@@ -11,7 +11,13 @@ declare module 'express-session' {
     user: { userId: number; publicKey: string };
     //----
 
-    status?: string;
+    status?: {
+      login?: string;
+      program?: string;
+      register?: string;
+      withdraw?: string;
+    };
+    
     tab?: any;
     // ... other custom properties
   }

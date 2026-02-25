@@ -1,5 +1,5 @@
 <h3>Programs</h3>
-<%- include('../partials/status') %>
+<%- include('../partials/status', { status: status?.program }) %>
 <% /*------------- DISABLED -------------*/ %>
 <% if(typeof disabled !== 'undefined') {%>
 <!-- programs -->
@@ -31,7 +31,7 @@
     <button class="tablinks <%= (tab == 1) ? 'active' : '' %>" id="defaultOpen" type="submit" form="myTab" name="tabInput" value="1">Test</button>
   </form>
 </span>
-<% if(typeof tab === 'undefined') { %>
+<% if(typeof tab === undefined) { %>
 select a program
 <% } %>
 <% const entry = programs[tab]; %>

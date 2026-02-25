@@ -181,16 +181,16 @@ export class AccountService {
       checkField(recipient, 'recipient');
       checkField(amount, 'amount');
 
-      const wallet = account.findKeypair(address)
+      const wallet = account.findKeypair(address);
       if (!wallet) throw Error('address not found in wallet');
 
-    //   checkField(wallet.balance, 'invalid balance', wallet.balance < amount);
+      //   checkField(wallet.balance, 'invalid balance', wallet.balance < amount);
 
       console.log('send');
       const result = await solanaUtils.withdraw(appConfig.CONNECTION, wallet.keypair, recipient, amount);
       return result;
-    } catch (err) {
-        // console.log(err)
+    } catch (err: any) {
+      // console.log(err)
       return `Error: ${err.message}`;
     }
   }

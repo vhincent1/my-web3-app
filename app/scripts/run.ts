@@ -2,7 +2,7 @@ import { OWNER_KEYPAIR_PATH, USER_KEYPAIR_PATH } from '../app.config.ts';
 import { Connection } from '@solana/web3.js';
 import { createSolanaToken, sendSPLTokens } from './createToken.ts';
 import { keypairUtils, solanaUtils, parseArgs } from '@my-util-lib/utils';
-import process from "node:process";
+import process from 'node:process';
 
 const connection = new Connection('http://thinkpadx270:8899', 'confirmed');
 const getArg = (index: number, fallback?: string) => process.argv[index] || fallback;
@@ -12,11 +12,11 @@ const commands: any = {
     const filename = getArg(3);
     keypairUtils.generateKeypair(filename);
   },
-  airdrop: async () => {
+  airdrop: () => {
     const keypair = keypairUtils.loadKeypair(getArg(3, OWNER_KEYPAIR_PATH));
     solanaUtils.requestAirdrop(connection, keypair.keypair.publicKey, 1);
   },
-  'read-key': async () => {
+  'read-key': () => {
     const keypair = keypairUtils.loadKeypair(getArg(3, USER_KEYPAIR_PATH));
     solanaUtils.accountDetails(connection, keypair.keypair.publicKey);
     solanaUtils.displayWalletTokens(connection, keypair.keypair.publicKey);

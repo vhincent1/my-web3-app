@@ -1,0 +1,32 @@
+<%
+
+const inbox = (index) => {
+  return account?.messages.filter((m) => m.inbox === index) || [];
+}
+%>
+<div class="container" id="inbox">
+  <h3>Inbox</h3>
+  Inbox (<%= inbox(0).length %>) | Sent (<%= inbox(1).length %>) | Archive (<%= inbox(2).length %>)
+  <br>
+  <% if(typeof query !== 'undefined' && query.inbox !== undefined) { %>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Title</th>
+        <th>From</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% inbox(parseInt(query.inbox)).forEach(message => { %>
+      <tr>
+        <td><%=message.timestamp %></td>
+        <td><%=message.title %></td>
+        <td><%=message.sender %></td>
+      </tr>
+      <% }); %>
+      <% } %>
+    </tbody>
+  </table>
+  <br>
+</div>

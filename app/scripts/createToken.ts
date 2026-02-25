@@ -1,11 +1,9 @@
 import { Connection, type Keypair, type clusterApiUrl, type LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { getMint, createMint, getOrCreateAssociatedTokenAccount, mintTo, type TOKEN_PROGRAM_ID, transfer } from '@solana/spl-token';
 
-import type { loadKeypair } from './keypair';
-
 const connection = new Connection('http://thinkpadx270:8899', 'confirmed');
 
-export async function createSolanaToken(connection: Connection, minter: Keypair) {
+export async function createSolanaToken(connection: Connection, minter: Keypair, supply: number = 1000) {
   // 1. Establish connection to the Solana Devnet
   // const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
 
@@ -23,7 +21,7 @@ export async function createSolanaToken(connection: Connection, minter: Keypair)
     minter, // Payer of the transaction fees
     minter.publicKey, // Mint authority
     null, // Freeze authority (null means no freeze authority)
-    decimals // Number of decimals
+    decimals, // Number of decimals
     // { commitment: 'confirmed' },
     // TOKEN_PROGRAM_ID
   );
@@ -36,20 +34,20 @@ export async function createSolanaToken(connection: Connection, minter: Keypair)
     connection, // Connection
     minter, // Payer of the transaction fees
     mint, // Mint address of the token
-    minter.publicKey // Owner of the ATA
+    minter.publicKey, // Owner of the ATA
   );
 
   console.log(`Associated Token Account Address: ${tokenAccount.address.toBase58()}`);
 
   // 6. Mint initial supply of tokens to the ATA
-  const initialSupply = 1000 * Math.pow(10, decimals); // Example: 1000 tokens
+  const initialSupply = supply * Math.pow(10, decimals); // Example: 1000 tokens
   await mintTo(
     connection, // Connection
     minter, // Payer of the transaction fees
     mint, // Mint address
     tokenAccount.address, // Destination token account
     minter.publicKey, // Mint authority
-    initialSupply // Amount to mint
+    initialSupply, // Amount to mint
   );
 
   console.log(`Minted ${initialSupply / Math.pow(10, decimals)} tokens to the owner account.`);
@@ -71,7 +69,7 @@ export async function sendSPLTokens(connection: Connection, senderWallet: Keypai
     connection,
     senderWallet, // Payer of the ATA creation fee if needed
     tokenMintAddress,
-    senderWallet.publicKey
+    senderWallet.publicKey,
   );
 
   // Get or create the recipient's associated token account (ATA)
@@ -85,7 +83,7 @@ export async function sendSPLTokens(connection: Connection, senderWallet: Keypai
     senderTokenAccount.address, // Source ATA
     receiverTokenAccount.address, // Destination ATA
     senderWallet.publicKey, // Owner of source account
-    transferAmount // Amount
+    transferAmount, // Amount
   );
 
   console.log(`Sent ${amountToTransfer} to ${receiverPubkey}`);

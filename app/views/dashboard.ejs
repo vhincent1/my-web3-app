@@ -10,6 +10,7 @@
 
 <body>
   <h1>Dashboard</h1>
+  <!-- Session -->
   <div class="container" id="session">
     <% if(session) { %>
     Session: userId=<%= session.user.userId %> publicKey=<%= session.user.publicKey %>
@@ -19,9 +20,16 @@
   </div>
   <br>
   <% if(session) { %>
+  <!-- Account -->
   <%- include('./account/index') %> <br>
+  <!-- Programs -->
   <%- include('./programs/index', {tab}) %><br>
   <% } %>
+  <!-- Accounts index -->
+  <br>
+  <div class="container" id="accounts">
+    <h3>Accounts Index</h3>
+  </div>
 </body>
 
 </html>
