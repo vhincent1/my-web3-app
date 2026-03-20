@@ -9,8 +9,12 @@
     "start": "NODE_ENV=development tsx watch index.ts"
   },
   "dependencies": {
+    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
+    "@metaplex-foundation/umi": "^1.5.1",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.5.1",
     "@solana/spl-token": "^0.4.14",
     "@solana/web3.js": "^1.98.4",
+    "dotenv": "^17.3.1",
     "fs": "^0.0.1-security",
     "promises": "^0.2.5",
     "tsx": "^4.21.0"

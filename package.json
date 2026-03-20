@@ -5,23 +5,16 @@
   "type": "module",
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "description": "",
   "private": true,
   "workspaces": [
     "app/",
     "my-util-lib/",
-    "program-motd/"
+    "program-motd/",
+    "react-app/"
   ],
   "scripts": {
-    "start": "NODE_ENV=production tsx app/src/index.ts",
-    "start:dev": "NODE_ENV=development tsx watch app/src/index.ts",
-    "tools": "tsx scripts/run.ts",
-    "client:build": "terser app/src/lib/wallet-connector.js -o app/public/js/wallet-connector.min.js --compress",
-    "program:build": "agave-install init stable\n cd program-motd/program\ncargo build-sbf --features debug",
-    "program:deploy": "agave-install init 2.2.9\n solana airdrop 1\nsolana program deploy program-motd/program/target/deploy/motd.so --program-id ./config/program-keypair.json",
-    "program:size": "du -sh ./program-motd/program/target/deploy/motd.so",
-    "program:test": "yarn run jest program-motd/tests/motd2.test.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+
   }
 }

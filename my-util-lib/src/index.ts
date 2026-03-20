@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -17,5 +20,4 @@ const checkField = (value: any, name: string, condition?) => {
 
 import { parseArgs } from './process.ts';
 import { keypairUtils, solanaUtils } from './solana.ts';
-
 export { keypairUtils, solanaUtils, checkField, parseArgs };

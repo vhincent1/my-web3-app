@@ -3,12 +3,14 @@
   "references": [
     { "path": "app/" },
     { "path": "my-util-lib/" },
-    { "path": "program-motd/" }
+    { "path": "program-motd/" },
+    { "path": "react-app/" }
   ],
   "compilerOptions": {
     "composite": true,
     "declaration": true,
 
+    
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "es2024",

@@ -1,5 +1,17 @@
 **/.DS_Store
 
+node_modules/
+
 config/
 logs/
-node_modules/
+
+# environment/config
+.env
+.env.local
+.env.*.local
+
+# miscellaneous
+*.log
+*.sqlite
+*.sqlite3
+*.lock

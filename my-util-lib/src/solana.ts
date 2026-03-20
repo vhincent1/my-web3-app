@@ -4,7 +4,6 @@ import path from 'path';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey, sendAndConfirmTransaction, SystemProgram, Transaction } from '@solana/web3.js';
 
-
 const GENERATE = true;
 
 const loadKeypair = (filePath: string, print: boolean = false) => {
@@ -22,11 +21,12 @@ const loadKeypair = (filePath: string, print: boolean = false) => {
   const secretKeyArray = JSON.parse(secretKeyString);
   const secretKeyUint8Array = Uint8Array.from(secretKeyArray);
   const loadedKeypair = Keypair.fromSecretKey(secretKeyUint8Array);
+
   if (print) console.log(`Loaded keypair=${filePath} address=${loadedKeypair.publicKey.toBase58()}`);
   return { filePath, keypair: loadedKeypair };
 };
 
-const generateKeypair = (filename?) => {
+const generateKeypair = (filename?, save = false) => {
   const keypair = Keypair.generate();
   if (!filename) filename = keypair.publicKey.toBase58();
   console.log(`New Public Key (address): ${keypair.publicKey.toBase58()}`);
@@ -37,7 +37,7 @@ const generateKeypair = (filename?) => {
   // 4. Define the file path (e.g., in the current directory)
   const savePath = './config/' + filename + '-keypair.json';
   // 5. Write the secret key array to a JSON file
-  fs.writeFileSync(savePath, JSON.stringify(secretKeyArray));
+  if (save) fs.writeFileSync(savePath, JSON.stringify(secretKeyArray));
   logKeypair(keypair);
   return keypair;
 };
@@ -306,7 +306,7 @@ async function getTransactionDetails(connection, signatures, programId) {
 
 //     console.log(`Total transactions fetched and filtered: ${allTransactions.length}`);
 //     // You can now process allTransactions for specific instruction data
-//     // console.log(JSON.stringify(allTransactions[0], null, 2)); 
+//     // console.log(JSON.stringify(allTransactions[0], null, 2));
 // }
 
 const solanaUtils = {
